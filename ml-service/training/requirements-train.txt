@@ -1,0 +1,5 @@
+# Extra dependencies needed only for training, not for running the ATS
+# scoring API itself (kept separate so the production image stays lean).
+datasets==2.20.0
+pandas==2.2.2
+torch>=2.2.0
