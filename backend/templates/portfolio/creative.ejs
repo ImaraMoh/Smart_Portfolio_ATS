@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title><%= user.name %> — Portfolio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+>
+
+<style>
+
+  /* ============================================================
+     COLOR THEME
+  ============================================================ */
+
+  :root {
+
+    /*
+     * The generator should provide `theme`.
+     *
+     * If no theme is provided, Midnight is used.
+     */
+
+    --primary: <%= theme?.primary || '#0B1220' %>;
+    --accent: <%= theme?.accent || '#D4AF37' %>;
+    --background: <%= theme?.background || '#F8FAFC' %>;
+    --text: <%= theme?.text || '#111827' %>;
+
+    /*
+     * Derived colors
+     */
+
+    --surface: #FFFFFF;
+    --surface-soft: color-mix(
+      in srgb,
+      var(--background) 88%,
+      var(--primary)
+    );
+
+    --border: var(--primary);
+
+    --muted: color-mix(
+      in srgb,
+      var(--text) 62%,
+      var(--background)
+    );
+
+    --accent-soft: color-mix(
+      in srgb,
+      var(--accent) 18%,
+      var(--background)
+    );
+
+    --primary-soft: color-mix(
+      in srgb,
+      var(--primary) 8%,
+      var(--background)
+    );
+
+  }
+
+
+  /* ============================================================
+     RESET
+  ============================================================ */
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: 'Archivo', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+
+  /* ============================================================
+     HERO
+  ============================================================ */
+
+  .hero {
+    position: relative;
+    padding: 76px 28px 52px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        color-mix(
+          in srgb,
+          var(--primary) 88%,
+          #000000
+        ) 100%
+      );
+
+    color: #FFFFFF;
+
+    border-bottom: 4px solid var(--accent);
+
+    overflow: hidden;
+  }
+
+
+  /* Decorative circle */
+
+  .hero::before {
+    content: "";
+
+    position: absolute;
+
+    top: -120px;
+    right: -90px;
+
+    width: 360px;
+    height: 360px;
+
+    background: var(--accent);
+
+    border-radius: 50%;
+
+    opacity: 0.92;
+
+    z-index: 0;
+  }
+
+
+  /* Decorative shape */
+
+  .hero::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: -120px;
+    left: -70px;
+
+    width: 250px;
+    height: 250px;
+
+    background: var(--accent);
+
+    opacity: 0.12;
+
+    transform: rotate(25deg);
+
+    border-radius: 40px;
+
+    z-index: 0;
+  }
+
+
+  .hero-inner {
+    position: relative;
+
+    z-index: 1;
+
+    max-width: 1000px;
+
+    margin: 0 auto;
+  }
+
+
+  /* ============================================================
+     KICKER
+  ============================================================ */
+
+  .kicker {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    background: var(--accent);
+
+    color: var(--primary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .15em;
+
+    text-transform: uppercase;
+
+    padding: 7px 14px;
+
+    margin-bottom: 24px;
+
+    border-radius: 999px;
+  }
+
+
+  .kicker-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--primary);
+  }
+
+
+  /* ============================================================
+     NAME
+  ============================================================ */
+
+  h1.name {
+    font-family: 'Archivo Black', sans-serif;
+
+    font-size: clamp(
+      46px,
+      9vw,
+      92px
+    );
+
+    line-height: .92;
+
+    letter-spacing: -.04em;
+
+    margin: 0 0 20px;
+
+    max-width: 900px;
+  }
+
+
+  .headline {
+    font-size: 20px;
+
+    font-weight: 600;
+
+    line-height: 1.45;
+
+    max-width: 48ch;
+
+    margin-bottom: 15px;
+
+    color: rgba(255,255,255,.88);
+  }
+
+
+  .bio {
+    font-size: 15px;
+
+    max-width: 62ch;
+
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+
+    color: rgba(255,255,255,.68);
+  }
+
+
+  /* ============================================================
+     CONTACT
+  ============================================================ */
+
+  .contact {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+
+  .contact a,
+  .contact span {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    font-size: 12.5px;
+
+    font-weight: 600;
+
+    padding: 8px 14px;
+
+    border: 1px solid rgba(255,255,255,.24);
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,.07);
+
+    color: #FFFFFF;
+
+    backdrop-filter: blur(8px);
+
+    transition:
+      background .2s ease,
+      border-color .2s ease,
+      transform .2s ease;
+  }
+
+
+  .contact a:hover {
+
+    background: var(--accent);
+
+    border-color: var(--accent);
+
+    color: var(--primary);
+
+    transform: translateY(-2px);
+  }
+
+
+  /* ============================================================
+     MAIN WRAPPER
+  ============================================================ */
+
+  .wrap {
+
+    max-width: 1000px;
+
+    margin: 0 auto;
+
+    padding: 0 28px;
+  }
+
+
+  /* ============================================================
+     SECTIONS
+  ============================================================ */
+
+  section {
+
+    padding: 58px 0;
+
+    border-bottom: 2px solid
+      color-mix(
+        in srgb,
+        var(--primary) 18%,
+        var(--background)
+      );
+  }
+
+
+  section:last-of-type {
+    border-bottom: none;
+  }
+
+
+  /* ============================================================
+     SECTION TITLE
+  ============================================================ */
+
+  .stitle {
+
+    font-family: 'Archivo Black', sans-serif;
+
+    font-size: clamp(
+      27px,
+      4vw,
+      40px
+    );
+
+    letter-spacing: -.025em;
+
+    margin: 0 0 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+  }
+
+
+  .stitle .dot {
+
+    width: 15px;
+    height: 15px;
+
+    background: var(--accent);
+
+    border-radius: 50%;
+
+    display: inline-block;
+
+    flex-shrink: 0;
+
+    box-shadow:
+      0 0 0 5px
+      color-mix(
+        in srgb,
+        var(--accent) 15%,
+        transparent
+      );
+  }
+
+
+  /* ============================================================
+     CARDS
+  ============================================================ */
+
+  .item {
+
+    position: relative;
+
+    border: 1.5px solid
+      color-mix(
+        in srgb,
+        var(--primary) 30%,
+        var(--background)
+      );
+
+    border-radius: 18px;
+
+    padding: 24px 25px;
+
+    margin-bottom: 18px;
+
+    background: var(--surface);
+
+    box-shadow:
+      0 10px 30px
+      color-mix(
+        in srgb,
+        var(--primary) 5%,
+        transparent
+      );
+
+    transition:
+      transform .25s ease,
+      box-shadow .25s ease,
+      border-color .25s ease;
+  }
+
+
+  .item:last-child {
+    margin-bottom: 0;
+  }
+
+
+  .item:hover {
+
+    transform: translateY(-3px);
+
+    border-color: var(--accent);
+
+    box-shadow:
+      0 18px 40px
+      color-mix(
+        in srgb,
+        var(--primary) 9%,
+        transparent
+      );
+  }
+
+
+  /* ============================================================
+     ROW
+  ============================================================ */
+
+  .row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    flex-wrap: wrap;
+
+    align-items: baseline;
+  }
+
+
+  .title {
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    color: var(--text);
+  }
+
+
+  .sub {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-top: 5px;
+
+    color: var(--primary);
+  }
+
+
+  .date {
+
+    font-size: 11.5px;
+
+    font-weight: 700;
+
+    color: var(--primary);
+
+    background: var(--accent-soft);
+
+    border: 1px solid
+      color-mix(
+        in srgb,
+        var(--accent) 40%,
+        transparent
+      );
+
+    padding: 5px 11px;
+
+    border-radius: 999px;
+
+    white-space: nowrap;
+  }
+
+
+  /* ============================================================
+     DESCRIPTION
+  ============================================================ */
+
+  .desc {
+
+    font-size: 14px;
+
+    color: var(--muted);
+
+    margin-top: 12px;
+
+    line-height: 1.7;
+  }
+
+
+  /* ============================================================
+     TECHNOLOGY TAGS
+  ============================================================ */
+
+  .tags {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 14px;
+  }
+
+
+  .tag {
+
+    font-size: 11.5px;
+
+    font-weight: 600;
+
+    padding: 5px 11px;
+
+    border: 1px solid
+      color-mix(
+        in srgb,
+        var(--primary) 25%,
+        transparent
+      );
+
+    border-radius: 999px;
+
+    color: var(--primary);
+
+    background: var(--primary-soft);
+  }
+
+
+  /* ============================================================
+     PROJECT LINKS
+  ============================================================ */
+
+  .plinks {
+
+    margin-top: 16px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+
+  .plinks a {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: var(--primary);
+
+    padding: 7px 12px;
+
+    border-radius: 9px;
+
+    background: var(--accent-soft);
+
+    border: 1px solid
+      color-mix(
+        in srgb,
+        var(--accent) 35%,
+        transparent
+      );
+
+    transition:
+      background .2s ease,
+      transform .2s ease;
+  }
+
+
+  .plinks a:hover {
+
+    background: var(--accent);
+
+    color: var(--primary);
+
+    transform: translateY(-2px);
+  }
+
+
+  /* ============================================================
+     SKILLS
+  ============================================================ */
+
+  .skills-wrap {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+
+  .skill-chip {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    padding: 10px 15px;
+
+    border: 1.5px solid
+      color-mix(
+        in srgb,
+        var(--primary) 28%,
+        transparent
+      );
+
+    border-radius: 11px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    transition:
+      background .2s ease,
+      color .2s ease,
+      border-color .2s ease,
+      transform .2s ease;
+  }
+
+
+  .skill-chip:hover {
+
+    background: var(--accent);
+
+    color: var(--primary);
+
+    border-color: var(--accent);
+
+    transform: translateY(-2px);
+  }
+
+
+  /* ============================================================
+     FOOTER
+  ============================================================ */
+
+  footer {
+
+    padding: 34px 0 40px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: var(--muted);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+  }
+
+
+  .footer-brand {
+
+    color: var(--primary);
+  }
+
+
+  .footer-accent {
+
+    color: var(--accent);
+
+    font-weight: 700;
+  }
+
+
+  /* ============================================================
+     RESPONSIVE
+  ============================================================ */
+
+  @media (max-width: 640px) {
+
+    .hero {
+
+      padding:
+        55px
+        18px
+        40px;
+    }
+
+    .wrap {
+
+      padding:
+        0
+        18px;
+    }
+
+    h1.name {
+
+      font-size:
+        clamp(
+          42px,
+          14vw,
+          64px
+        );
+    }
+
+    .headline {
+
+      font-size: 17px;
+    }
+
+    .bio {
+
+      font-size: 14px;
+    }
+
+    section {
+
+      padding: 42px 0;
+    }
+
+    .item {
+
+      padding: 20px;
+    }
+
+    .title {
+
+      font-size: 17px;
+    }
+
+    .date {
+
+      margin-top: 3px;
+    }
+
+    footer {
+
+      flex-direction: column;
+    }
+  }
+
+
+  /* ============================================================
+     REDUCED MOTION
+  ============================================================ */
+
+  @media (prefers-reduced-motion: reduce) {
+
+    * {
+      scroll-behavior: auto !important;
+      transition: none !important;
+    }
+  }
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+
+<div class="hero">
+
+  <div class="hero-inner">
+
+    <span class="kicker">
+      <span class="kicker-dot"></span>
+
+      Portfolio ·
+      <%= new Date().getFullYear() %>
+
+    </span>
+
+
+    <h1 class="name">
+      <%= user.name %>
+    </h1>
+
+
+    <% if (user.headline) { %>
+
+      <div class="headline">
+        <%= user.headline %>
+      </div>
+
+    <% } %>
+
+
+    <% if (user.bio) { %>
+
+      <div class="bio">
+        <%= user.bio %>
+      </div>
+
+    <% } %>
+
+
+    <div class="contact">
+
+      <% if (user.email) { %>
+
+        <a
+          href="mailto:<%= user.email %>"
+        >
+          <%= user.email %>
+        </a>
+
+      <% } %>
+
+
+      <% if (user.location) { %>
+
+        <span>
+          <%= user.location %>
+        </span>
+
+      <% } %>
+
+
+      <% if (
+        user.socialLinks &&
+        user.socialLinks.github
+      ) { %>
+
+        <a
+          href="<%= user.socialLinks.github %>"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+
+      <% } %>
+
+
+      <% if (
+        user.socialLinks &&
+        user.socialLinks.linkedin
+      ) { %>
+
+        <a
+          href="<%= user.socialLinks.linkedin %>"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          LinkedIn
+        </a>
+
+      <% } %>
+
+
+      <% if (user.website) { %>
+
+        <a
+          href="<%= user.website %>"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Website
+        </a>
+
+      <% } %>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
+
+<div class="wrap">
+
+
+  <!-- ==========================================================
+       EXPERIENCE
+  =========================================================== -->
+
+  <% if (experience && experience.length) { %>
+
+    <section>
+
+      <div class="stitle">
+        <span class="dot"></span>
+        Experience
+      </div>
+
+
+      <% experience.forEach(function(e){ %>
+
+        <div class="item">
+
+          <div class="row">
+
+            <div>
+
+              <div class="title">
+                <%= e.role %>
+              </div>
+
+              <div class="sub">
+                <%= e.company %>
+              </div>
+
+            </div>
+
+
+            <div class="date">
+
+              <%= e.startDate
+                ? new Date(e.startDate).getFullYear()
+                : ''
+              %>
+
+              –
+
+              <%= e.isCurrent
+                ? 'Now'
+                : (
+                    e.endDate
+                    ? new Date(e.endDate).getFullYear()
+                    : ''
+                  )
+              %>
+
+            </div>
+
+          </div>
+
+
+          <% if (e.description) { %>
+
+            <div class="desc">
+              <%= e.description %>
+            </div>
+
+          <% } %>
+
+
+          <% if (
+            e.technologies &&
+            e.technologies.length
+          ) { %>
+
+            <div class="tags">
+
+              <% e.technologies.forEach(function(t){ %>
+
+                <span class="tag">
+                  <%= t %>
+                </span>
+
+              <% }) %>
+
+            </div>
+
+          <% } %>
+
+        </div>
+
+      <% }) %>
+
+    </section>
+
+  <% } %>
+
+
+
+  <!-- ==========================================================
+       PROJECTS
+  =========================================================== -->
+
+  <% if (projects && projects.length) { %>
+
+    <section>
+
+      <div class="stitle">
+        <span class="dot"></span>
+        Projects
+      </div>
+
+
+      <% projects.forEach(function(p){ %>
+
+        <div class="item">
+
+          <div class="row">
+
+            <div class="title">
+              <%= p.title %>
+            </div>
+
+          </div>
+
+
+          <% if (p.description) { %>
+
+            <div class="desc">
+              <%= p.description %>
+            </div>
+
+          <% } %>
+
+
+          <% if (
+            p.technologies &&
+            p.technologies.length
+          ) { %>
+
+            <div class="tags">
+
+              <% p.technologies.forEach(function(t){ %>
+
+                <span class="tag">
+                  <%= t %>
+                </span>
+
+              <% }) %>
+
+            </div>
+
+          <% } %>
+
+
+          <% if (
+            p.liveURL ||
+            p.repoURL
+          ) { %>
+
+            <div class="plinks">
+
+              <% if (p.liveURL) { %>
+
+                <a
+                  href="<%= p.liveURL %>"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ↗ Live
+                </a>
+
+              <% } %>
+
+
+              <% if (p.repoURL) { %>
+
+                <a
+                  href="<%= p.repoURL %>"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ↗ Code
+                </a>
+
+              <% } %>
+
+            </div>
+
+          <% } %>
+
+        </div>
+
+      <% }) %>
+
+    </section>
+
+  <% } %>
+
+
+
+  <!-- ==========================================================
+       SKILLS
+  =========================================================== -->
+
+  <% if (skills && skills.length) { %>
+
+    <section>
+
+      <div class="stitle">
+        <span class="dot"></span>
+        Skills
+      </div>
+
+
+      <div class="skills-wrap">
+
+        <% skills.forEach(function(s){ %>
+
+          <span class="skill-chip">
+            <%= s.skillName %>
+          </span>
+
+        <% }) %>
+
+      </div>
+
+    </section>
+
+  <% } %>
+
+
+
+  <!-- ==========================================================
+       EDUCATION
+  =========================================================== -->
+
+  <% if (education && education.length) { %>
+
+    <section>
+
+      <div class="stitle">
+        <span class="dot"></span>
+        Education
+      </div>
+
+
+      <% education.forEach(function(ed){ %>
+
+        <div class="item">
+
+          <div class="row">
+
+            <div>
+
+              <div class="title">
+                <%= ed.degree %>
+              </div>
+
+              <div class="sub">
+                <%= ed.institution %>
+              </div>
+
+            </div>
+
+
+            <div class="date">
+
+              <%= ed.startYear %>
+
+              –
+
+              <%= ed.endYear || 'Now' %>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      <% }) %>
+
+    </section>
+
+  <% } %>
+
+
+
+  <!-- ==========================================================
+       VOLUNTEERING
+  =========================================================== -->
+
+  <% if (volunteer && volunteer.length) { %>
+
+    <section>
+
+      <div class="stitle">
+        <span class="dot"></span>
+        Volunteering
+      </div>
+
+
+      <% volunteer.forEach(function(v){ %>
+
+        <div class="item">
+
+          <div class="row">
+
+            <div>
+
+              <div class="title">
+                <%= v.role %>
+              </div>
+
+              <div class="sub">
+                <%= v.organization %>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <% if (v.description) { %>
+
+            <div class="desc">
+              <%= v.description %>
+            </div>
+
+          <% } %>
+
+        </div>
+
+      <% }) %>
+
+    </section>
+
+  <% } %>
+
+
+
+  <!-- ==========================================================
+       FOOTER
+  =========================================================== -->
+
+  <footer>
+
+    <span class="footer-brand">
+      Built with Smart Portfolio Generator
+    </span>
+
+    <span>
+      Last updated
+      <span class="footer-accent">
+        <%= updatedAt %>
+      </span>
+    </span>
+
+  </footer>
+
+
+</div>
+
+</body>
+</html>

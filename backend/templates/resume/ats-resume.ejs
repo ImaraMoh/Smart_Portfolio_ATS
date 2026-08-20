@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title><%= user.name %> — Resume</title>
+<style>
+  /*
+    ATS-FRIENDLY RESUME TEMPLATE
+    -----------------------------
+    Deliberately plain: single column, no tables, no text-in-images,
+    no icons standing in for words, standard fonts, standard headings,
+    black text on white. This is what most ATS parsers handle reliably.
+  */
+  @page { margin: 0.55in 0.65in; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 10.5pt;
+    color: #111111;
+    line-height: 1.42;
+    margin: 0;
+  }
+  h1 { font-size: 20pt; margin: 0 0 2px; font-weight: 700; }
+  .headline { font-size: 11pt; color: #333; margin-bottom: 6px; }
+  .contact-line { font-size: 9.5pt; color: #333; margin-bottom: 14px; }
+  .contact-line span { margin-right: 12px; }
+  h2 {
+    font-size: 11.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1.2pt solid #111;
+    padding-bottom: 3px;
+    margin: 16px 0 8px;
+  }
+  .entry { margin-bottom: 10px; }
+  .entry-head { display: flex; justify-content: space-between; font-weight: 700; font-size: 10.5pt; }
+  .entry-sub { font-style: italic; font-size: 10pt; color: #222; margin-bottom: 3px; }
+  .entry-date { font-weight: 400; font-size: 9.5pt; color: #333; white-space: nowrap; }
+  ul { margin: 4px 0 0; padding-left: 16px; }
+  li { margin-bottom: 2px; }
+  .skills-line { font-size: 10pt; }
+  .summary { font-size: 10pt; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+  <h1><%= user.name %></h1>
+  <% if (user.headline) { %><div class="headline"><%= user.headline %></div><% } %>
+  <div class="contact-line">
+    <% if (user.email) { %><span><%= user.email %></span><% } %>
+    <% if (user.phone) { %><span><%= user.phone %></span><% } %>
+    <% if (user.location) { %><span><%= user.location %></span><% } %>
+    <% if (user.website) { %><span><%= user.website %></span><% } %>
+    <% if (user.socialLinks && user.socialLinks.linkedin) { %><span><%= user.socialLinks.linkedin %></span><% } %>
+    <% if (user.socialLinks && user.socialLinks.github) { %><span><%= user.socialLinks.github %></span><% } %>
+  </div>
+
+  <% if (user.bio) { %>
+  <h2>Summary</h2>
+  <div class="summary"><%= user.bio %></div>
+  <% } %>
+
+  <% if (experience && experience.length) { %>
+  <h2>Experience</h2>
+  <% experience.forEach(function(e){ %>
+    <div class="entry">
+      <div class="entry-head">
+        <span><%= e.role %>, <%= e.company %></span>
+        <span class="entry-date"><%= e.startDate ? new Date(e.startDate).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '' %> - <%= e.isCurrent ? 'Present' : (e.endDate ? new Date(e.endDate).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '') %></span>
+      </div>
+      <% if (e.location) { %><div class="entry-sub"><%= e.location %></div><% } %>
+      <% if (e.description) { %>
+        <ul>
+          <% e.description.split(/\n|\.\s+/).filter(function(s){return s.trim().length>0;}).forEach(function(line){ %>
+            <li><%= line.trim() %></li>
+          <% }) %>
+        </ul>
+      <% } %>
+      <% if (e.technologies && e.technologies.length) { %>
+        <div class="skills-line"><strong>Technologies:</strong> <%= e.technologies.join(', ') %></div>
+      <% } %>
+    </div>
+  <% }) %>
+  <% } %>
+
+  <% if (projects && projects.length) { %>
+  <h2>Projects</h2>
+  <% projects.forEach(function(p){ %>
+    <div class="entry">
+      <div class="entry-head"><span><%= p.title %></span></div>
+      <% if (p.description) { %><div class="entry-sub"><%= p.description %></div><% } %>
+      <% if (p.technologies && p.technologies.length) { %>
+        <div class="skills-line"><strong>Technologies:</strong> <%= p.technologies.join(', ') %></div>
+      <% } %>
+    </div>
+  <% }) %>
+  <% } %>
+
+  <% if (skills && skills.length) { %>
+  <h2>Skills</h2>
+  <div class="skills-line"><%= skills.map(function(s){return s.skillName;}).join(', ') %></div>
+  <% } %>
+
+  <% if (education && education.length) { %>
+  <h2>Education</h2>
+  <% education.forEach(function(ed){ %>
+    <div class="entry">
+      <div class="entry-head">
+        <span><%= ed.degree %><%= ed.fieldOfStudy ? (', ' + ed.fieldOfStudy) : '' %>, <%= ed.institution %></span>
+        <span class="entry-date"><%= ed.startYear %> - <%= ed.endYear || 'Present' %></span>
+      </div>
+      <% if (ed.grade) { %><div class="entry-sub">Grade: <%= ed.grade %></div><% } %>
+    </div>
+  <% }) %>
+  <% } %>
+
+  <% if (volunteer && volunteer.length) { %>
+  <h2>Volunteering</h2>
+  <% volunteer.forEach(function(v){ %>
+    <div class="entry">
+      <div class="entry-head">
+        <span><%= v.role %>, <%= v.organization %></span>
+        <span class="entry-date"><%= v.startDate ? new Date(v.startDate).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '' %> - <%= v.isCurrent ? 'Present' : (v.endDate ? new Date(v.endDate).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '') %></span>
+      </div>
+      <% if (v.description) { %><div class="entry-sub"><%= v.description %></div><% } %>
+    </div>
+  <% }) %>
+  <% } %>
+</body>
+</html>
