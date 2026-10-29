@@ -83,10 +83,9 @@ const NAV = [
    SIDEBAR
 ============================================================ */
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed, onCollapsedChange }) => {
   const { user, logout } = useAuth();
 
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const initial =
@@ -230,8 +229,8 @@ const Sidebar = () => {
 
           lg:sticky
           lg:top-5
-          lg:ml-5
           lg:h-[calc(100vh-40px)]
+          lg:shrink-0
 
           ${collapsed ? 'lg:w-[78px]' : 'lg:w-[258px]'}
 
@@ -255,9 +254,13 @@ const Sidebar = () => {
             overflow-hidden
             rounded-[30px]
             border
-            border-white/[0.08]
-            bg-[#090E18]
-            shadow-[0_24px_80px_rgba(15,23,42,0.18)]
+            border-white/[0.12]
+            bg-gradient-to-br
+            from-[#111827]/95
+            via-[#090E18]/95
+            to-[#090E18]/90
+            backdrop-blur-2xl
+            shadow-[0_24px_80px_rgba(15,23,42,0.22)]
           "
         >
           {/* ==================================================
@@ -605,9 +608,7 @@ const Sidebar = () => {
 
         <button
           type="button"
-          onClick={() =>
-            setCollapsed((value) => !value)
-          }
+          onClick={() => onCollapsedChange((value) => !value)}
           aria-label={
             collapsed
               ? 'Expand sidebar'

@@ -5,12 +5,60 @@
 @layer base {
   body { @apply bg-paper text-ink; }
   h1, h2, h3 { @apply font-display; }
+  body { background-image: radial-gradient(ellipse at 12% 0%, rgba(212, 162, 78, 0.09), transparent 32rem), radial-gradient(ellipse at 92% 18%, rgba(58, 92, 224, 0.055), transparent 30rem); }
+}
+
+@keyframes dashboard-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ambient-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+.dashboard-page-enter { animation: dashboard-enter 420ms cubic-bezier(.2,.7,.2,1) both; }
+
+.dashboard-shell { position: relative; isolation: isolate; }
+.dashboard-shell::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  top: 8%;
+  right: 3%;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 9999px;
+  background: rgba(212, 162, 78, 0.08);
+  filter: blur(70px);
+  animation: ambient-drift 9s ease-in-out infinite;
+}
+
+.dashboard-content .entity-section > section,
+.dashboard-content section[class*="bg-white"],
+.dashboard-content .card,
+.dashboard-content a.group > div[class*="bg-white"] {
+  border-color: rgba(255, 255, 255, 0.78);
+  background-color: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 14px 42px rgba(30, 41, 59, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background-color 220ms ease;
+}
+
+.dashboard-content .entity-section > section:hover,
+.dashboard-content a.group > div[class*="bg-white"]:hover {
+  border-color: rgba(212, 162, 78, 0.28);
+  box-shadow: 0 20px 54px rgba(30, 41, 59, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 @layer components {
 
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-[#111827] text-white text-sm font-semibold px-5 py-2.5 shadow-sm hover:bg-black hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+    box-shadow: 0 8px 20px rgba(17, 24, 39, 0.16);
   }
 
   .btn-secondary {
@@ -23,6 +71,7 @@
 
   .input-field {
     @apply w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all duration-200;
+    backdrop-filter: blur(10px);
   }
 
   .label {
@@ -30,7 +79,17 @@
   }
 
   .card {
-    @apply bg-white border border-gray-200/80 rounded-[22px] p-6 shadow-sm;
+    @apply bg-white/75 border border-white/80 rounded-[22px] p-6 shadow-sm;
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    backdrop-filter: blur(18px) saturate(1.2);
+    box-shadow: 0 14px 42px rgba(30, 41, 59, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
   }
 
+  .card:hover { transform: translateY(-2px); border-color: rgba(212, 162, 78, 0.28); box-shadow: 0 20px 54px rgba(30, 41, 59, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

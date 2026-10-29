@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   Plus,
@@ -120,7 +121,7 @@ const EntitySection = ({
   };
 
   return (
-    <div className="w-full">
+    <div className="entity-section w-full">
 
       {/* =====================================================
           SECTION HEADER
@@ -482,8 +483,7 @@ const EntitySection = ({
       {/* =====================================================
           PREMIUM MODAL
       ===================================================== */}
-      {modalOpen && (
-
+      {modalOpen && createPortal(
         <div
           className="
             fixed
@@ -493,6 +493,7 @@ const EntitySection = ({
             items-center
             justify-center
             bg-ink/60
+            overflow-y-auto
             p-4
             backdrop-blur-sm
           "
@@ -506,16 +507,21 @@ const EntitySection = ({
           <div
             className="
               relative
-              max-h-[92vh]
+              my-auto
+              max-h-[min(92vh,900px)]
               w-full
               max-w-2xl
               overflow-hidden
               rounded-[28px]
               border
-              border-white/10
-              bg-white
-              shadow-[0_35px_100px_rgba(0,0,0,0.25)]
+              border-white/40
+              bg-white/90
+              shadow-[0_35px_100px_rgba(0,0,0,0.3)]
+              backdrop-blur-2xl
             "
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="entity-modal-title"
           >
 
             {/* =================================================
@@ -545,7 +551,7 @@ const EntitySection = ({
                       : 'New Record'}
                   </div>
 
-                  <h3 className="mt-0.5 font-display text-xl font-semibold text-ink">
+                  <h3 id="entity-modal-title" className="mt-0.5 font-display text-xl font-semibold text-ink">
                     {editing
                       ? `Edit ${title}`
                       : `Add ${title}`}
@@ -582,7 +588,7 @@ const EntitySection = ({
             {/* =================================================
                 FORM
             ================================================= */}
-            <div className="max-h-[calc(92vh-100px)] overflow-y-auto px-6 py-6 sm:px-7">
+            <div className="max-h-[calc(min(92vh,900px)-100px)] overflow-y-auto px-6 py-6 sm:px-7">
 
               <div className="mb-5 rounded-2xl border border-gold/20 bg-gold/[0.055] px-4 py-3">
 
@@ -614,8 +620,8 @@ const EntitySection = ({
 
           </div>
 
-        </div>
-
+        </div>,
+        document.body
       )}
 
     </div>
