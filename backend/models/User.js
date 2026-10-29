@@ -112,6 +112,7 @@ const userSchema = new mongoose.Schema(
     | tech-dark
     | executive
     | neo-brutalist
+    | ai-studio
     |
     */
 
@@ -125,6 +126,7 @@ const userSchema = new mongoose.Schema(
         'tech-dark',
         'executive',
         'neo-brutalist',
+        'ai-studio',
       ],
 
       default: 'modern',

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap"
     rel="stylesheet"
   />
 
@@ -28,20 +28,28 @@
       --text: <%= theme?.text || '#111827' %>;
 
       --white: #FFFFFF;
+      --surface: <%= theme?.surface || '#FFFFFF' %>;
 
-      --muted: color-mix(
+      --muted: <%= theme?.muted || '#64748B' %>;
+
+      /* Selected palette carries through the editorial artwork and cards. */
+      --muted-derived: color-mix(
         in srgb,
         var(--text) 55%,
         white
       );
 
-      --line: color-mix(
+      --line: <%= theme?.border || '#E2E8F0' %>;
+
+      --line-derived: color-mix(
         in srgb,
         var(--text) 12%,
         white
       );
 
-      --soft: color-mix(
+      --soft: <%= theme?.softAccent || '#F4F0E5' %>;
+
+      --soft-derived: color-mix(
         in srgb,
         var(--background) 65%,
         white
@@ -773,20 +781,12 @@
     ========================================================= */
 
     footer {
-      padding: 28px 70px;
-
-      border-top: 1px solid var(--line);
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      line-height: 1.6;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 30px 70px; border-top: 1px solid color-mix(in srgb, white 18%, transparent);
+      background: var(--primary); color: white; font-size: 12px; line-height: 1.7;
     }
 
-    footer strong {
-      color: var(--primary);
-    }
+    footer strong { color: white; font-family: "Playfair Display", serif; font-size: 18px; }
 
     /* =========================================================
        RESPONSIVE
@@ -873,6 +873,172 @@
 
     }
 
+    /* MAISON NO. 6 — editorial hierarchy with sculptural, palette-led materials */
+    .hero { min-height: 650px; display: flex; align-items: center; isolation: isolate; box-shadow: 0 30px 90px rgba(10,20,35,.22); }
+    .hero-inner { width: 59%; max-width: 730px; z-index: 3; }
+    .artwork-scene { position: absolute; z-index: 1; inset: 0 0 0 auto; width: 53%; display: grid; place-items: center; pointer-events: none; }
+    .artwork-scene svg { width: 112%; filter: drop-shadow(0 35px 54px rgba(28,20,10,.28)); animation: maison-float 10s ease-in-out infinite; }
+    .content { padding-top:92px; display:grid; grid-template-columns:130px minmax(0,1fr); gap:42px; align-items:start; }
+    .maison-rail { position:sticky; top:28px; display:grid; gap:18px; padding-top:12px; color:var(--primary); font-family:"Playfair Display",serif; font-size:12px; letter-spacing:.12em; }
+    .maison-rail a { display:flex; gap:12px; color:var(--muted); font:600 10px "DM Sans",sans-serif; text-decoration:none; letter-spacing:.04em; }
+    .maison-rail a small { color:var(--text); font-size:10px; }
+    .maison-rail .rail-rule { width:44px; height:1px; background:var(--accent); }
+    .maison-stack { min-width:0; display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:22px; align-items:start; }
+    .maison-stack > .maison-experience,.maison-stack > .maison-projects { grid-column:span 12; }
+    .maison-stack > .maison-skills,.maison-stack > .maison-education,.maison-stack > .maison-volunteer { grid-column:span 6; }
+    .maison-projects .projects-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .maison-experience .timeline { border-left:1px solid var(--line); padding-left:28px; }
+    .maison-education .education-grid { grid-template-columns:1fr; }
+
+    .section { padding-top: 62px; padding-bottom: 58px; }
+    .project, .education { border: 1px solid var(--line); border-radius: 4px 22px 22px 22px; background: var(--surface); box-shadow: 0 16px 48px color-mix(in srgb,var(--primary) 10%,transparent); }
+    .project:hover, .education:hover { transform: translateY(-5px); box-shadow: 0 28px 68px rgba(30,24,16,.16); }
+    .portfolio-project-art { margin: 0 0 20px; overflow: hidden; border-radius: 4px 16px 16px 16px; background: linear-gradient(135deg,var(--soft),var(--accent) 55%,var(--surface)); }
+    footer { flex-wrap: wrap; }
+    .portfolio-project-art svg { display: block; width: 100%; height: 130px; transition: transform .55s ease; }
+    .project:hover .portfolio-project-art svg { transform: scale(1.08); }
+    .section-heading { transition: transform .45s ease; }
+    .section:hover .section-heading { transform: translateX(6px); }
+    @keyframes maison-float { 0%,100% { transform: translateY(0) rotate(1deg); } 50% { transform: translateY(-12px) rotate(-1deg); } }
+    @media(max-width:760px) { .content { grid-template-columns:1fr; gap:12px; } .maison-rail { position:static; display:flex; align-items:center; overflow:auto; border-bottom:1px solid var(--line); padding:0 0 12px; } .maison-rail a { white-space:nowrap; } .maison-stack { grid-template-columns:1fr; gap:8px; } .maison-stack > .section { grid-column:1; } .maison-projects .projects-grid { grid-template-columns:1fr; } .hero { min-height: 580px; } .hero-inner { width: 100%; } .artwork-scene { width: 100%; opacity: .35; } }
+  
+    /* Responsive Maison editorial layout */
+    *,*::before,*::after { box-sizing:border-box; } html,body { width:100%; max-width:100%; overflow-x:clip; } img,svg,video,canvas { max-width:100%; } .page,.content,.maison-stack,.section { min-width:0; }
+    @media(max-width:980px) { .content { grid-template-columns:1fr; gap:20px; } .maison-rail { position:static; display:flex; align-items:center; overflow-x:auto; padding:0 0 14px; border-bottom:1px solid var(--line); } .maison-rail a { white-space:nowrap; } .maison-stack { grid-template-columns:repeat(2,minmax(0,1fr)); } .maison-stack > .maison-experience,.maison-stack > .maison-projects { grid-column:1/-1; } }
+    @media(max-width:680px) { .maison-rail { gap:14px; } .maison-rail > span,.maison-rail .rail-rule { display:none; } .maison-stack { grid-template-columns:1fr; } .maison-stack > .section { grid-column:1/-1; } .maison-projects .projects-grid { grid-template-columns:1fr; } .hero { min-height:0; padding:42px 22px; } .hero-inner { width:100%; } .name,.hero h1 { font-size:clamp(38px,12vw,62px); overflow-wrap:anywhere; } .experience-item { grid-template-columns:1fr !important; } footer { padding-inline:22px; } }
+    @media(max-width:380px) { .content { padding-inline:14px; } .section { padding-inline:16px; } .contact { flex-wrap:wrap; } }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
+  
+    /* MAISON NO. 6 — a magazine spread with its own editorial rhythm */
+    .page { max-width:none; width:100%; overflow:clip; background:var(--background); box-shadow:none; }
+    .hero { min-height:790px; display:flex; align-items:center; padding:36px clamp(26px,8vw,128px) 92px; background:radial-gradient(ellipse at 79% 43%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 32%),linear-gradient(135deg,var(--primary),color-mix(in srgb,var(--primary) 88%,#000)); }
+    .hero::before { top:17%; right:13%; width:460px; height:460px; border-color:color-mix(in srgb,var(--accent) 36%,transparent); box-shadow:0 0 80px color-mix(in srgb,var(--accent) 19%,transparent),0 0 0 48px color-mix(in srgb,var(--surface) 4%,transparent); }
+    .maison-masthead { position:absolute; z-index:4; top:28px; left:clamp(26px,8vw,128px); right:clamp(26px,8vw,128px); display:flex; align-items:center; gap:24px; padding-bottom:16px; border-bottom:1px solid color-mix(in srgb,var(--surface) 22%,transparent); color:color-mix(in srgb,var(--surface) 70%,transparent); font:600 9px "DM Sans",sans-serif; letter-spacing:.16em; }
+    .maison-wordmark { display:inline-flex; align-items:center; gap:10px; color:var(--surface); text-decoration:none; }
+    .maison-wordmark b { color:var(--accent); }
+    .maison-seal { display:grid; place-items:center; width:31px; height:31px; border:1px solid color-mix(in srgb,var(--accent) 68%,transparent); border-radius:50%; color:var(--accent); font:600 18px "Cormorant Garamond",serif; }
+    .hero-inner { width:min(55%,720px); max-width:none; margin:44px 0 0; }
+    .eyebrow { display:inline-block; padding:0 0 12px; border-bottom:1px solid color-mix(in srgb,var(--accent) 65%,transparent); color:var(--accent); font:600 9px "DM Sans",sans-serif; letter-spacing:.2em; text-transform:uppercase; }
+    .name { max-width:770px; margin-top:20px; font:500 clamp(66px,9.5vw,130px)/.82 "Cormorant Garamond",serif; letter-spacing:-.055em; text-wrap:balance; }
+    .headline { max-width:570px; margin-top:26px; color:color-mix(in srgb,var(--surface) 88%,transparent); font:400 clamp(20px,2.5vw,31px)/1.25 "Cormorant Garamond",serif; }
+    .bio { max-width:490px; margin-top:16px; color:color-mix(in srgb,var(--surface) 68%,transparent); font-size:12px; line-height:1.9; }
+    .contact { gap:8px; margin-top:24px; }
+    .contact a,.contact span { padding:9px 13px; border:1px solid color-mix(in srgb,var(--surface) 22%,transparent); border-radius:999px; background:color-mix(in srgb,var(--surface) 7%,transparent); color:var(--surface); font-size:9px; backdrop-filter:blur(12px); }
+    .contact a:hover { border-color:var(--accent); background:var(--accent); color:var(--primary); }
+    .artwork-scene { inset:14% 4% 5% auto; width:53%; perspective:1000px; }
+    .artwork-scene svg { width:118%; filter:drop-shadow(0 45px 65px rgba(0,0,0,.42)); animation:maison-sculpture 11s ease-in-out infinite; }
+    .maison-index { position:sticky; z-index:7; top:0; display:flex; align-items:center; gap:clamp(14px,3vw,38px); width:min(100% - 64px,1280px); min-height:70px; margin:-34px auto 0; padding:10px 22px; border:1px solid color-mix(in srgb,var(--line) 76%,var(--accent)); border-radius:3px; background:color-mix(in srgb,var(--surface) 94%,transparent); box-shadow:0 17px 42px color-mix(in srgb,var(--primary) 11%,transparent); backdrop-filter:blur(20px); }
+    .maison-index > span { margin-right:auto; color:var(--muted); font-size:8px; font-weight:700; letter-spacing:.17em; white-space:nowrap; }
+    .maison-index a { display:flex; gap:7px; color:var(--accent); font:600 9px "DM Sans",sans-serif; white-space:nowrap; }
+    .maison-index a b { color:var(--text); font-weight:600; }
+    .maison-index a:hover b { color:var(--accent); }
+    .maison-index > i { color:var(--muted); font:500 8px "DM Sans",sans-serif; font-style:normal; letter-spacing:.12em; white-space:nowrap; }
+    .content { display:block; width:min(100% - 64px,1280px); max-width:none; margin:0 auto; padding:88px 0 45px; }
+    .maison-stack { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:0 38px; }
+    .maison-stack > .maison-experience,.maison-stack > .maison-projects,.maison-stack > .maison-skills { grid-column:1/-1; }
+    .maison-stack > .maison-education,.maison-stack > .maison-volunteer { grid-column:span 6; }
+    .section { min-width:0; margin:0; padding:56px 0 64px; border:0; border-bottom:1px solid var(--line); background:transparent; box-shadow:none; }
+    .section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin:0 0 34px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+    .section-label { margin-bottom:8px; color:var(--accent); font-size:8px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; }
+    .section-title { margin:0; color:var(--text); font:500 clamp(40px,6vw,68px)/.9 "Cormorant Garamond",serif; letter-spacing:-.045em; }
+    .section-number { color:color-mix(in srgb,var(--accent) 76%,var(--muted)); font:500 13px "DM Sans",sans-serif; letter-spacing:.12em; }
+    .timeline { position:relative; display:grid; gap:0; border:0 !important; padding:0 0 0 38px !important; }
+    .timeline::before { content:""; position:absolute; left:7px; top:12px; bottom:18px; width:1px; background:linear-gradient(var(--accent),var(--line) 80%,transparent); }
+    .experience-item { position:relative; display:grid; grid-template-columns:minmax(150px,.28fr) minmax(0,1fr); gap:34px; padding:22px 0 26px; border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent); transition:padding .3s ease,background .3s ease; }
+    .experience-item::before { content:""; position:absolute; left:-36px; top:31px; width:7px; height:7px; border:2px solid var(--accent); border-radius:50%; background:var(--background); box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 10%,transparent); }
+    .experience-item:hover { padding-left:10px; background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 5%,transparent),transparent 60%); }
+    .date { color:var(--accent); font:600 9px "DM Sans",sans-serif; letter-spacing:.1em; }
+    .experience-role,.project-title,.degree,.volunteer-role { color:var(--text); font-family:"Cormorant Garamond",serif; letter-spacing:-.025em; }
+    .experience-role { font-size:30px; line-height:1.02; }
+    .experience-company,.institution,.volunteer-org { margin-top:6px; color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
+    .description,.project-description,.volunteer-description { max-width:68ch; margin-top:12px; color:var(--muted); font-size:12px; line-height:1.85; }
+    .projects-grid { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:18px; }
+    .project { grid-column:span 5; min-width:0; padding:14px 14px 20px; border:1px solid var(--line); border-radius:3px; background:var(--surface); box-shadow:0 12px 35px color-mix(in srgb,var(--primary) 6%,transparent); transition:transform .4s ease,box-shadow .4s ease,border-color .4s ease; }
+    .project:first-child { grid-column:span 7; }
+    .project:nth-child(3n) { grid-column:span 6; }
+    .project:hover { transform:translateY(-7px); border-color:color-mix(in srgb,var(--accent) 54%,var(--line)); box-shadow:0 24px 54px color-mix(in srgb,var(--primary) 13%,transparent); }
+    .project-featured { display:inline-block; margin:0 0 10px; color:var(--accent); font-size:8px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; }
+    .project-title { margin:0; font-size:clamp(24px,3.1vw,38px); line-height:1; }
+    .portfolio-project-art { height:190px; margin:0 0 19px; border-radius:0; background:linear-gradient(135deg,var(--soft),color-mix(in srgb,var(--accent) 40%,var(--soft)),var(--surface)); }
+    .portfolio-project-art svg { height:100%; }
+    .project-links a { display:inline-block; margin:16px 14px 0 0; padding-bottom:4px; border-bottom:1px solid var(--accent); color:var(--text); font:700 8px "DM Sans",sans-serif; letter-spacing:.12em; }
+    .skills-grid { display:flex; flex-wrap:wrap; gap:9px; }
+    .skill { padding:10px 13px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--text); font-size:9px; font-weight:700; transition:transform .25s ease,color .25s ease,border-color .25s ease; }
+    .skill:hover { transform:translateY(-3px); border-color:var(--accent); color:var(--accent); }
+    .education-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+    .education,.volunteer { padding:21px 22px; border:1px solid var(--line); border-radius:3px; background:var(--surface); transition:transform .3s ease,border-color .3s ease; }
+    .education:hover,.volunteer:hover { transform:translateY(-4px); border-color:var(--accent); }
+    .degree,.volunteer-role { font-size:26px; line-height:1.04; }
+    .education-date,.volunteer-description { color:var(--muted); font-size:10px; line-height:1.75; }
+    .volunteer-item { display:grid; grid-template-columns:28px 1fr; gap:13px; padding:17px 0; border-bottom:1px solid var(--line); }
+    .volunteer-icon { display:grid; place-items:center; width:26px; height:26px; border:1px solid var(--accent); border-radius:50%; color:var(--accent); }
+    footer { display:flex; justify-content:space-between; align-items:center; gap:18px; margin:0; padding:30px max(32px,calc((100vw - 1280px)/2)); border-top:1px solid color-mix(in srgb,var(--surface) 16%,transparent); background:var(--primary); color:color-mix(in srgb,var(--surface) 72%,transparent); font-size:10px; letter-spacing:.04em; }
+    footer strong { color:var(--surface); font:500 22px "Cormorant Garamond",serif; }
+    @keyframes maison-sculpture { 0%,100% { transform:translateY(0) rotate(1deg); } 50% { transform:translateY(-12px) rotate(-1deg); } }
+    @media(max-width:980px) { .hero { min-height:700px; } .maison-index { width:calc(100% - 40px); gap:16px; overflow-x:auto; } .maison-index > i { display:none; } .content { width:calc(100% - 48px); } .maison-stack > .maison-education,.maison-stack > .maison-volunteer { grid-column:span 6; } }
+    @media(max-width:680px) { .hero { min-height:0; padding:92px 24px 255px; } .maison-masthead { top:20px; left:24px; right:24px; flex-wrap:wrap; } .maison-masthead > span:last-child { margin-left:auto; font-size:7px; } .hero-inner { width:100%; margin:0; } .name { font-size:clamp(56px,15vw,82px); } .artwork-scene { inset:auto -4% 0 auto; width:82%; height:260px; opacity:.5; } .maison-index { position:relative; top:auto; width:calc(100% - 28px); min-height:58px; margin:-22px auto 0; padding:8px 12px; gap:16px; border-radius:3px; } .maison-index > span { display:none; } .content { width:calc(100% - 36px); padding-top:44px; } .maison-stack { grid-template-columns:1fr; gap:0; } .maison-stack > .section { grid-column:1/-1; } .section { padding:38px 0 42px; } .section-title { font-size:48px; } .experience-item { grid-template-columns:1fr; gap:9px; } .projects-grid { grid-template-columns:1fr; } .project,.project:first-child,.project:nth-child(3n) { grid-column:1/-1; } .portfolio-project-art { height:165px; } footer { align-items:flex-start; flex-direction:column; padding:24px 22px; } }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
+  
+    /* Maison's content systems: archive timeline, art gallery and atelier sheet */
+    .maison-stack { display:flex; flex-direction:column; gap:0; }
+    .maison-stack > .section { width:100%; }
+    .maison-stack > .maison-skills { position:relative; width:calc(100% + 56px); margin:30px -28px; padding:42px 38px; overflow:hidden; border:1px solid color-mix(in srgb,var(--accent) 28%,transparent); background:radial-gradient(ellipse at 90% 0%,color-mix(in srgb,var(--accent) 19%,transparent),transparent 38%),linear-gradient(125deg,var(--primary),color-mix(in srgb,var(--primary) 89%,#000)); color:var(--surface); }
+    .maison-skills::after { content:"06"; position:absolute; right:5%; bottom:-.48em; color:color-mix(in srgb,var(--surface) 5%,transparent); font:600 clamp(150px,24vw,310px)/1 "Cormorant Garamond",serif; pointer-events:none; }
+    .maison-skills .section-heading { position:relative; z-index:1; border-color:color-mix(in srgb,var(--surface) 18%,transparent); }
+    .maison-skills .section-title { color:var(--surface); }
+    .maison-skills .section-label,.maison-skills .section-number { color:var(--accent); }
+    .maison-capability-sheet { position:relative; z-index:1; display:grid; grid-template-columns:190px minmax(0,1fr); gap:35px; align-items:start; }
+    .capability-note { display:grid; justify-items:start; gap:6px; padding:9px 0; color:color-mix(in srgb,var(--surface) 65%,transparent); }
+    .capability-note span { font-size:8px; font-weight:700; letter-spacing:.16em; }
+    .capability-note strong { color:var(--accent); font:500 66px/.9 "Cormorant Garamond",serif; }
+    .capability-note small { font-size:9px; letter-spacing:.06em; }
+    .maison-skill-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .maison-skill-list .skill { display:flex; align-items:center; gap:10px; min-width:0; padding:13px 12px; border:1px solid color-mix(in srgb,var(--surface) 17%,transparent); border-radius:2px; color:var(--surface); background:color-mix(in srgb,var(--surface) 7%,transparent); font-size:9px; letter-spacing:.025em; animation:maison-skill-appear .55s both; }
+    .maison-skill-list .skill:nth-child(3n + 2) { animation-delay:.08s; } .maison-skill-list .skill:nth-child(3n) { animation-delay:.16s; }
+    .skill-glyph { color:var(--accent); font-size:13px; }
+    .skill-arrow { margin-left:auto; color:color-mix(in srgb,var(--accent) 70%,transparent); transition:transform .25s ease; }
+    .maison-skill-list .skill:hover { transform:translateY(-3px); border-color:var(--accent); background:color-mix(in srgb,var(--accent) 15%,transparent); }
+    .maison-skill-list .skill:hover .skill-arrow { transform:translate(2px,-2px); }
+    .maison-gallery { display:flex; gap:20px; overflow-x:auto; padding:2px 5px 26px 1px; scroll-snap-type:x mandatory; scrollbar-color:color-mix(in srgb,var(--accent) 55%,var(--line)) transparent; scrollbar-width:thin; }
+    .maison-gallery:focus-visible { outline:2px solid var(--accent); outline-offset:5px; }
+    .maison-gallery .project,.maison-gallery .project:first-child,.maison-gallery .project:nth-child(3n) { position:relative; display:block; flex:0 0 min(460px,48%); min-height:390px; padding:13px 13px 22px; scroll-snap-align:start; }
+    .maison-gallery .project:nth-child(even) { margin-top:38px; }
+    .maison-gallery .project.is-featured { border-color:color-mix(in srgb,var(--accent) 55%,var(--line)); }
+    .maison-gallery .project::after { content:""; position:absolute; inset:0; z-index:0; background:linear-gradient(150deg,transparent 40%,color-mix(in srgb,var(--accent) 8%,transparent)); opacity:0; pointer-events:none; transition:opacity .4s ease; }
+    .maison-gallery .project:hover::after { opacity:1; }
+    .portfolio-project-art { position:relative; display:grid; place-items:center; height:215px; margin-bottom:21px; background:radial-gradient(ellipse at 50% 60%,color-mix(in srgb,var(--accent) 28%,var(--soft)),var(--soft) 65%); }
+    .portfolio-project-art::before,.portfolio-project-art::after { content:""; position:absolute; width:115px; height:115px; border:1px solid color-mix(in srgb,var(--primary) 25%,transparent); border-radius:50%; }
+    .portfolio-project-art::before { transform:translate(-18px,9px) rotateX(68deg); }
+    .portfolio-project-art::after { width:148px; height:148px; transform:translate(10px,-2px) rotateY(68deg); }
+    .portfolio-project-art svg { position:relative; z-index:1; width:88%; max-height:88%; }
+    .art-edition { position:absolute; z-index:2; top:12px; left:13px; color:var(--primary); font:700 8px "DM Sans",sans-serif; letter-spacing:.14em; }
+    .maison-gallery .project-title,.maison-gallery .project-description,.maison-gallery .tags,.maison-gallery .project-links,.maison-gallery .project-featured { position:relative; z-index:1; margin-left:12px; margin-right:12px; }
+    .maison-gallery .project-title { margin-top:8px; font-size:34px; }
+    .maison-gallery .project-description { min-height:42px; }
+    .maison-education { padding-right:36px; border-right:1px solid var(--line); }
+    .maison-education-list { display:grid; gap:11px; }
+    .maison-education-list .education { position:relative; min-height:150px; padding:21px 22px 20px 62px; }
+    .maison-education-list .education::before { content:"✳"; position:absolute; top:22px; left:21px; color:var(--accent); font-size:20px; }
+    .maison-education-list .degree { font-size:27px; }
+    .maison-impact-ledger { border-top:1px solid var(--line); }
+    .maison-impact-ledger .volunteer-item { grid-template-columns:38px minmax(0,1fr); align-items:start; gap:14px; padding:18px 0; }
+    .maison-impact-ledger .volunteer-item:last-child { border-bottom:0; }
+    .volunteer-icon { width:34px; height:34px; }
+    .volunteer-icon svg { width:18px; height:18px; }
+    .maison-impact-ledger .volunteer-role { font-size:25px; }
+    .maison-impact-ledger .volunteer-org { color:var(--accent); }
+    .maison-stack > section { animation:maison-section-in .7s both cubic-bezier(.2,.8,.2,1); }
+    .maison-stack > section:nth-child(2) { animation-delay:.1s; }
+    .maison-stack > section:nth-child(3) { animation-delay:.18s; }
+    .maison-stack > section:nth-child(4) { animation-delay:.26s; }
+    .maison-stack > section:nth-child(5) { animation-delay:.34s; }
+    .experience-item::before { transition:transform .3s ease,box-shadow .3s ease; }
+    .experience-item:hover::before { transform:scale(1.7); box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 12%,transparent); }
+    @keyframes maison-section-in { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes maison-skill-appear { from { opacity:0; transform:translateY(9px) rotate(-1deg); } to { opacity:1; transform:translateY(0) rotate(0); } }
+    @media(max-width:980px) { .maison-stack > .maison-skills { width:100%; margin:22px 0; padding:32px 26px; } .maison-capability-sheet { grid-template-columns:140px minmax(0,1fr); gap:20px; } .maison-skill-list { grid-template-columns:repeat(2,minmax(0,1fr)); } .maison-gallery .project,.maison-gallery .project:first-child,.maison-gallery .project:nth-child(3n) { flex-basis:min(430px,62%); } }
+    @media(max-width:680px) { .maison-capability-sheet { grid-template-columns:1fr; gap:12px; } .capability-note { grid-template-columns:auto 1fr auto; align-items:center; } .capability-note strong { font-size:36px; } .maison-skill-list { grid-template-columns:repeat(2,minmax(0,1fr)); } .maison-gallery .project,.maison-gallery .project:first-child,.maison-gallery .project:nth-child(3n) { flex-basis:88%; min-height:0; } .maison-gallery .project:nth-child(even) { margin-top:0; } .portfolio-project-art { height:185px; } .maison-education { padding-right:0; border-right:0; } }
+    @media(prefers-reduced-motion:reduce) { .maison-stack > section,.maison-skill-list .skill { animation:none !important; } }
   </style>
 </head>
 
@@ -886,10 +1052,30 @@
 
   <header class="hero">
 
+    <div class="maison-masthead"><a class="maison-wordmark" href="#top"><span class="maison-seal">✳</span><span>PORTFOLIO</span></a><span>PORTFOLIO ARCHIVE / <%= new Date().getFullYear() %></span></div>
+
+    <div class="artwork-scene artwork-scene--maison" aria-hidden="true">
+      <svg viewBox="0 0 600 460" role="presentation">
+        <defs>
+          <linearGradient id="maisonPaper" x1="0" x2="1" y2="1"><stop stop-color="var(--surface)"/><stop offset="1" stop-color="var(--soft)"/></linearGradient>
+          <radialGradient id="maisonSphere" cx="27%" cy="23%"><stop stop-color="var(--surface)"/><stop offset=".38" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--primary)"/></radialGradient>
+        </defs>
+        <ellipse cx="336" cy="389" rx="174" ry="23" fill="var(--primary)" opacity=".24"/>
+        <g transform="rotate(5 334 219)">
+          <rect x="192" y="63" width="255" height="305" rx="4" fill="url(#maisonPaper)" stroke="var(--surface)" stroke-width="3"/>
+          <path d="M220 103h76M220 138h180M220 153h150" stroke="var(--primary)" stroke-width="2" opacity=".34"/>
+          <circle cx="331" cy="244" r="77" fill="url(#maisonSphere)"/>
+          <ellipse cx="331" cy="244" rx="117" ry="38" transform="rotate(-26 331 244)" fill="none" stroke="var(--surface)" stroke-width="2" stroke-opacity=".85"/>
+          <path d="M285 211c18-28 49-39 77-25" fill="none" stroke="var(--surface)" stroke-width="3"/>
+          <rect x="220" y="333" width="112" height="4" fill="var(--primary)" opacity=".45"/>
+        </g>
+      </svg>
+    </div>
+
     <div class="hero-inner">
 
       <div class="eyebrow">
-        Professional Portfolio · <%= new Date().getFullYear() %>
+        A considered record of work · <%= new Date().getFullYear() %>
       </div>
 
       <h1 class="name">
@@ -972,12 +1158,15 @@
 
   </header>
 
+  <nav class="maison-index" aria-label="Portfolio sections"><span>IN THIS EDITION</span><a href="#experience">01 <b>Career</b></a><a href="#projects">02 <b>Selected work</b></a><a href="#skills">03 <b>Expertise</b></a><a href="#education">04 <b>Education</b></a><a href="#volunteer">05 <b>Community</b></a><i>MAISON / 06</i></nav>
+
 
   <!-- =======================================================
        CONTENT
   ======================================================== -->
 
   <main class="content">
+    <div class="maison-stack">
 
     <!-- =====================================================
          EXPERIENCE
@@ -985,7 +1174,7 @@
 
     <% if (experience && experience.length) { %>
 
-      <section class="section">
+      <section class="section maison-experience" id="experience">
 
         <div class="section-heading">
 
@@ -1106,7 +1295,7 @@
 
     <% if (projects && projects.length) { %>
 
-      <section class="section">
+      <section class="section maison-projects" id="projects">
 
         <div class="section-heading">
 
@@ -1128,11 +1317,13 @@
 
         </div>
 
-        <div class="projects-grid">
+        <div class="maison-gallery" tabindex="0" aria-label="Selected projects gallery">
 
-          <% projects.forEach(function(p){ %>
+          <% projects.forEach(function(p, index){ %>
 
-            <article class="project">
+            <article class="project <%= p.featured ? 'is-featured' : '' %>">
+
+              <div class="portfolio-project-art" aria-hidden="true"><span class="art-edition">PLATE / <%= String(index + 1).padStart(2,'0') %></span><svg viewBox="0 0 420 160"><rect x="111" y="14" width="198" height="132" rx="3" fill="#f4ead8"/><path d="M133 36h83M133 47h148" stroke="#8a7658" stroke-width="2" opacity=".45"/><circle cx="210" cy="92" r="36" fill="#d7b876"/><ellipse cx="210" cy="92" rx="62" ry="21" transform="rotate(-24 210 92)" fill="none" stroke="#fff9e9" stroke-width="3"/><path d="M133 131h85" stroke="#8a7658" stroke-width="3" opacity=".4"/></svg></div>
 
               <% if (p.featured) { %>
 
@@ -1215,7 +1406,7 @@
 
     <% if (skills && skills.length) { %>
 
-      <section class="section">
+      <section class="section maison-skills" id="skills">
 
         <div class="section-heading">
 
@@ -1237,16 +1428,19 @@
 
         </div>
 
-        <div class="skills-grid">
+        <div class="maison-capability-sheet">
+          <div class="capability-note"><span>THE WORKING PALETTE</span><strong><%= (skills || []).length.toString().padStart(2,'0') %></strong><small>skills & disciplines</small></div>
+          <div class="maison-skill-list">
 
           <% skills.forEach(function(s){ %>
 
             <div class="skill">
-              <%= s.skillName %>
+              <span class="skill-glyph">✳</span><span><%= s.skillName %></span><span class="skill-arrow">↗</span>
             </div>
 
           <% }) %>
 
+          </div>
         </div>
 
       </section>
@@ -1260,7 +1454,7 @@
 
     <% if (education && education.length) { %>
 
-      <section class="section">
+      <section class="section maison-education" id="education">
 
         <div class="section-heading">
 
@@ -1282,7 +1476,7 @@
 
         </div>
 
-        <div class="education-grid">
+        <div class="maison-education-list">
 
           <% education.forEach(function(ed){ %>
 
@@ -1345,7 +1539,7 @@
 
     <% if (volunteer && volunteer.length) { %>
 
-      <section class="section">
+      <section class="section maison-volunteer" id="volunteer">
 
         <div class="section-heading">
 
@@ -1367,15 +1561,13 @@
 
         </div>
 
-        <div>
+        <div class="maison-impact-ledger">
 
           <% volunteer.forEach(function(v){ %>
 
             <article class="volunteer-item">
 
-              <div class="volunteer-icon">
-                +
-              </div>
+              <div class="volunteer-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8 14.3 8l5.7.6-4.3 3.8 1.2 5.6-4.9-2.9-4.9 2.9 1.2-5.6L4 8.6 9.7 8 12 2.8Z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="M5 21h14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></div>
 
               <div>
 
@@ -1407,6 +1599,7 @@
 
     <% } %>
 
+    </div>
   </main>
 
 
@@ -1415,17 +1608,8 @@
   ======================================================== -->
 
   <footer>
-
-    <strong>
-      <%= user.name %>
-    </strong>
-
-    · Professional Portfolio
-
-    · Last updated <%= updatedAt %>
-
-    · Built with Smart Portfolio Generator
-
+    <strong><%= user.name %></strong>
+    <span>Last updated <%= updatedAt %></span>
   </footer>
 
 </div>

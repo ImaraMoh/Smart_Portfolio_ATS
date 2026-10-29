@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link
-  href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Manrope:wght@400;500;600;700;800&display=swap"
   rel="stylesheet"
 >
 
@@ -37,26 +37,18 @@
      * Derived colors
      */
 
-    --surface: #FFFFFF;
+    --surface: <%= theme?.surface || '#FFFFFF' %>;
     --surface-soft: color-mix(
       in srgb,
       var(--background) 88%,
       var(--primary)
     );
 
-    --border: var(--primary);
+    --border: <%= theme?.border || '#E2E8F0' %>;
 
-    --muted: color-mix(
-      in srgb,
-      var(--text) 62%,
-      var(--background)
-    );
+    --muted: <%= theme?.muted || '#64748B' %>;
 
-    --accent-soft: color-mix(
-      in srgb,
-      var(--accent) 18%,
-      var(--background)
-    );
+    --accent-soft: <%= theme?.softAccent || 'color-mix(in srgb, var(--accent) 18%, var(--background))' %>;
 
     --primary-soft: color-mix(
       in srgb,
@@ -83,7 +75,7 @@
     margin: 0;
     background: var(--background);
     color: var(--text);
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -226,7 +218,7 @@
   ============================================================ */
 
   h1.name {
-    font-family: 'Archivo Black', sans-serif;
+    font-family: 'Fraunces', serif;
 
     font-size: clamp(
       46px,
@@ -369,7 +361,7 @@
 
   .stitle {
 
-    font-family: 'Archivo Black', sans-serif;
+    font-family: 'Fraunces', serif;
 
     font-size: clamp(
       27px,
@@ -823,7 +815,112 @@
     }
   }
 
-</style>
+  /* COLORFIELD — playful art direction, collage shapes and tactile cards */
+  .hero { min-height: 680px; overflow: hidden; isolation: isolate; background-size: 160% 160%; animation: field-shift 18s ease-in-out infinite alternate; }
+  .hero-inner { z-index: 3; width: 58%; }
+  .artwork-scene { position: absolute; z-index: 1; inset: 0 0 0 auto; width: 58%; display: grid; place-items: center; pointer-events: none; }
+  .artwork-scene svg { width: 114%; filter: drop-shadow(0 32px 55px rgba(45,20,52,.24)); animation: field-float 7s ease-in-out infinite; }
+  .contact a, .contact span { border-radius: 999px; backdrop-filter: blur(12px); }
+  .item { border-radius: 24px; box-shadow: 0 24px 55px rgba(36,20,44,.12); transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease; }
+  .item:hover { transform: translateY(-8px) rotate(.25deg); box-shadow: 0 34px 70px rgba(36,20,44,.19); }
+  .portfolio-project-art { margin: 0 0 18px; overflow: hidden; border-radius: 18px; background: linear-gradient(135deg,#ffb7a5,#e6b5ed 54%,#a5e9d4); }
+  .portfolio-project-art svg { display: block; width: 100%; height: 130px; transition: transform .55s ease; }
+  .item:hover .portfolio-project-art svg { transform: scale(1.09) rotate(1deg); }
+  .tag, .skill-chip { border-radius: 999px; box-shadow: 0 8px 22px rgba(25,20,35,.08); }
+  .stitle { font-size: clamp(28px,4vw,44px); letter-spacing: -.04em; }
+  @keyframes field-float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-14px) rotate(1deg); } }
+  @keyframes field-shift { to { background-position: 100% 50%; } }
+  .wrap { width:min(100% - 48px,1160px); max-width:none; }
+  .colorfield-canvas { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:24px; align-items:start; }
+  .field-index { grid-column:1/-1; display:flex; align-items:center; flex-wrap:wrap; gap:18px; padding:14px 18px; border:1px solid var(--border); border-radius:999px; background:color-mix(in srgb,var(--surface) 82%,var(--accent-soft)); }
+  .field-index span { margin-right:auto; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.14em; }
+  .field-index a { color:var(--primary); font-size:10px; font-weight:700; text-decoration:none; }
+  .field-index a:hover { color:var(--accent); }
+  @media(max-width:760px) { .field-index { border-radius:18px; gap:10px; } .field-index span { flex-basis:100%; } }
+  .field-layer { grid-column:span 6; min-width:0; }
+  .field-experience,.field-projects { grid-column:span 12; }
+  .field-projects .item { display:grid; grid-template-columns:minmax(220px,.82fr) minmax(0,1.18fr); column-gap:24px; align-items:start; }
+  .field-projects .item > .portfolio-project-art { grid-row:span 5; align-self:stretch; min-height:180px; }
+  .field-skills .skills-wrap { display:flex; flex-wrap:wrap; gap:12px; }
+  @media(max-width:760px) { .colorfield-canvas { grid-template-columns:1fr; gap:8px; } .field-layer,.field-experience,.field-projects { grid-column:1; } .field-projects .item { display:block; } }
+  section { position:relative; margin:26px 0; padding:46px clamp(22px,4vw,48px); overflow:hidden; border:1px solid color-mix(in srgb,var(--border) 72%,var(--accent)); border-radius:28px; background:color-mix(in srgb,var(--surface) 90%,var(--accent-soft)); box-shadow:0 22px 58px color-mix(in srgb,var(--primary) 9%,transparent); }
+  .item { border-color:color-mix(in srgb,var(--border) 78%,var(--accent)); background:linear-gradient(135deg,var(--surface),color-mix(in srgb,var(--accent-soft) 46%,var(--surface))); }
+  .item:hover { border-color:var(--accent); box-shadow:0 32px 70px color-mix(in srgb,var(--primary) 17%,transparent); }
+  .title,.item-title { color:var(--primary); }
+  .desc,.item-desc { color:var(--muted); }
+  .skill-chip { display:inline-flex; align-items:center; gap:8px; }
+  .skill-chip::before { content:'✦'; color:var(--accent); transform-origin:center; transition:transform .3s ease; }
+  .skill-chip:hover::before { transform:rotate(35deg) scale(1.2); }
+  footer { margin:42px 0 20px; padding:28px 32px; align-items:center; border-radius:22px; background:linear-gradient(110deg,var(--primary),color-mix(in srgb,var(--primary) 76%,var(--accent))); color:#fff; box-shadow:0 24px 60px color-mix(in srgb,var(--primary) 22%,transparent); }
+  .footer-brand { color:#fff; font-size:13px; }
+  .footer-signature { color:rgba(255,255,255,.72); font-weight:400; }
+  .footer-accent { color:var(--accent); }
+  @media(max-width:760px) { .hero { min-height: 620px; } .hero-inner { width: 100%; } .artwork-scene { width: 100%; opacity: .4; } }
+  @media(max-width:760px) { .wrap { width:calc(100% - 28px); } section { margin:16px 0; padding:30px 20px; border-radius:22px; } footer { align-items:flex-start; flex-direction:column; padding:24px 20px; } }
+
+  /* Responsive Colorfield canvas */
+  *,*::before,*::after { box-sizing:border-box; } html,body { width:100%; max-width:100%; overflow-x:clip; } img,svg,video,canvas { max-width:100%; }
+  .colorfield-canvas,.field-layer,.item { min-width:0; } .field-index { max-width:100%; }
+  @media(max-width:920px) { .field-layer { grid-column:span 6; } .field-experience,.field-projects { grid-column:1/-1; } .field-projects .item { grid-template-columns:minmax(150px,.7fr) minmax(0,1.3fr); } }
+  @media(max-width:640px) { .colorfield-canvas { width:calc(100% - 24px); } .hero { min-height:0; padding:42px 22px; } .hero-inner { width:100%; } .name,.hero h1 { font-size:clamp(38px,12vw,62px); overflow-wrap:anywhere; } .field-layer,.field-experience,.field-projects { grid-column:1/-1; } .field-projects .item { display:block; } .field-index { align-items:flex-start; } .field-index a { font-size:9px; } section { padding:26px 18px; } .row { flex-wrap:wrap; gap:8px; } footer { width:100%; } }
+  @media(max-width:380px) { .colorfield-canvas { width:calc(100% - 16px); } section { padding:22px 14px; } .stitle { font-size:28px; } }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
+  
+  /* COLORFIELD — editorial layers, intentional typography and richer card rhythm */
+  body { font-family:'Manrope',sans-serif; letter-spacing:-.012em; }
+  .hero { min-height:690px; display:flex; align-items:center; padding:clamp(54px,8vw,112px) clamp(24px,7vw,104px); border:0; border-radius:0 0 48px 48px; background:radial-gradient(ellipse at 77% 26%,color-mix(in srgb,var(--accent) 25%,transparent),transparent 38%),linear-gradient(128deg,var(--primary),color-mix(in srgb,var(--primary) 76%,var(--accent))); }
+  .hero::before { width:clamp(280px,36vw,520px); height:clamp(280px,36vw,520px); top:-23%; right:6%; border:1px solid color-mix(in srgb,var(--surface) 30%,transparent); background:color-mix(in srgb,var(--accent) 84%,transparent); opacity:.42; filter:blur(1px); box-shadow:0 0 0 36px color-mix(in srgb,var(--surface) 6%,transparent),0 0 0 82px color-mix(in srgb,var(--surface) 4%,transparent); }
+  .hero::after { width:240px; height:240px; bottom:-160px; left:38%; border:1px solid color-mix(in srgb,var(--surface) 28%,transparent); background:color-mix(in srgb,var(--accent) 36%,transparent); filter:blur(1px); transform:rotate(35deg); }
+  .hero-inner { width:min(100%,1180px); margin:0 auto; padding-right:clamp(0px,35vw,460px); }
+  .artwork-scene { inset:0 2% 0 auto; width:min(54%,720px); perspective:1100px; }
+  .artwork-scene svg { width:116%; filter:drop-shadow(0 40px 70px rgba(0,0,0,.32)); animation:field-float 8s ease-in-out infinite; }
+  .kicker { border:1px solid color-mix(in srgb,var(--surface) 28%,transparent); background:color-mix(in srgb,var(--surface) 12%,transparent); color:color-mix(in srgb,var(--surface) 88%,var(--accent)); backdrop-filter:blur(16px); letter-spacing:.18em; }
+  .kicker-dot { background:var(--accent); box-shadow:0 0 14px var(--accent); }
+  h1.name { max-width:760px; font:600 clamp(58px,8.3vw,112px)/.88 'Fraunces',serif; letter-spacing:-.055em; text-wrap:balance; }
+  .headline { max-width:580px; margin:24px 0 0; font-size:clamp(17px,2vw,24px); font-weight:600; line-height:1.42; color:rgba(255,255,255,.92); }
+  .bio { max-width:520px; font-size:14px; line-height:1.85; color:rgba(255,255,255,.72); }
+  .contact { gap:9px; }
+  .contact a,.contact span { min-height:40px; padding:10px 15px; border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.085); font-size:10px; letter-spacing:.015em; }
+  .contact a:first-child { color:var(--primary); border-color:var(--accent); background:var(--accent); }
+  .wrap { width:min(100% - 64px,1280px); padding:0; }
+  .colorfield-canvas { column-gap:24px; row-gap:24px; padding-top:42px; }
+  .field-index { position:sticky; z-index:6; top:14px; grid-column:1/-1; min-height:64px; padding:9px 12px 9px 22px; border:1px solid color-mix(in srgb,var(--border) 70%,var(--accent)); border-radius:20px; background:color-mix(in srgb,var(--surface) 82%,transparent); box-shadow:0 16px 42px color-mix(in srgb,var(--primary) 10%,transparent); backdrop-filter:blur(22px) saturate(1.25); }
+  .field-index span { font-size:8px; letter-spacing:.18em; }
+  .field-index a { padding:11px 13px; border:1px solid transparent; border-radius:13px; color:var(--muted); font-size:10px; transition:all .25s ease; }
+  .field-index a:hover,.field-index a:focus-visible { border-color:color-mix(in srgb,var(--accent) 22%,transparent); outline:none; color:var(--primary); background:var(--accent-soft); transform:translateY(-1px); }
+  section.field-layer { margin:0; padding:clamp(28px,4vw,52px); border:1px solid color-mix(in srgb,var(--border) 76%,var(--accent)); border-radius:30px; background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 96%,transparent),color-mix(in srgb,var(--surface) 84%,var(--accent-soft))); box-shadow:0 22px 58px color-mix(in srgb,var(--primary) 8%,transparent),inset 0 1px rgba(255,255,255,.76); }
+  .field-experience,.field-projects { grid-column:1/-1; }
+  .field-skills,.field-education { grid-column:span 6; }
+  .field-volunteer { grid-column:1/-1; }
+  .section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:28px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+  .section-index { display:block; margin-bottom:7px; color:var(--accent); font:800 9px 'Manrope',sans-serif; letter-spacing:.17em; }
+  .stitle { margin:0; color:var(--text); font:600 clamp(30px,3.8vw,48px)/1.02 'Fraunces',serif; letter-spacing:-.04em; }
+  .section-note { padding-bottom:5px; color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.04em; }
+  .field-experience .item { display:grid; grid-template-columns:minmax(180px,.38fr) minmax(0,1fr); column-gap:28px; align-items:start; }
+  .field-experience .item .row { grid-column:1; display:block; }
+  .field-experience .item .desc,.field-experience .item .tags { grid-column:2; }
+  .field-experience .item .date { justify-self:start; margin-top:12px; }
+  .field-projects .item { grid-template-columns:minmax(260px,.9fr) minmax(0,1.1fr); column-gap:clamp(22px,4vw,48px); align-items:start; }
+  .field-projects .item > .portfolio-project-art { grid-column:1; grid-row:1/8; min-height:260px; display:grid; place-items:center; border:1px solid var(--border); border-radius:22px; }
+  .field-projects .portfolio-project-art svg { height:100%; min-height:220px; }
+  .field-projects .item .row,.field-projects .item > .desc,.field-projects .item > .tags,.field-projects .item > .project-links { grid-column:2; }
+  .field-projects .item .title { font:600 clamp(25px,3vw,38px)/1.1 'Fraunces',serif; letter-spacing:-.035em; }
+  .item { border:1px solid color-mix(in srgb,var(--border) 78%,var(--accent)); border-radius:20px; padding:22px 24px; background:color-mix(in srgb,var(--surface) 92%,var(--accent-soft)); box-shadow:0 12px 30px color-mix(in srgb,var(--primary) 6%,transparent); }
+  .item + .item { margin-top:14px; }
+  .title { color:var(--text); font-size:16px; font-weight:800; letter-spacing:-.025em; }
+  .sub { color:var(--primary); font-size:11px; font-weight:800; letter-spacing:.055em; text-transform:uppercase; }
+  .desc { color:var(--muted); font-size:12px; line-height:1.85; }
+  .date { color:var(--primary); background:var(--accent-soft); font-size:9px; letter-spacing:.08em; }
+  .tag,.skill-chip { border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border)); background:color-mix(in srgb,var(--surface) 78%,var(--accent-soft)); color:var(--text); font-size:9px; font-weight:700; letter-spacing:.02em; }
+  .skill-chip { min-height:39px; padding:10px 14px; }
+  .field-education .item,.field-volunteer .item { min-height:120px; }
+  .field-education .title,.field-volunteer .title { font:600 22px/1.18 'Fraunces',serif; }
+  .colorfield-canvas > footer { grid-column:1/-1; }
+  footer { display:flex; max-width:1280px; width:calc(100% - 64px); margin:0 auto 22px; padding:24px 30px; border:1px solid color-mix(in srgb,var(--surface) 20%,transparent); border-radius:22px; }
+  @media(max-width:980px) { .field-skills,.field-education,.field-volunteer { grid-column:span 6; } .field-volunteer { grid-column:1/-1; } .hero-inner { padding-right:27vw; } .hero { min-height:620px; } .field-projects .item { grid-template-columns:minmax(200px,.85fr) minmax(0,1.15fr); } }
+  @media(max-width:680px) { .hero { min-height:620px; padding:44px 22px 230px; border-radius:0 0 30px 30px; } .hero-inner { padding:0; } .artwork-scene { top:auto; right:0; bottom:0; width:78%; height:245px; opacity:.5; } .field-index { position:relative; top:auto; justify-content:flex-start; border-radius:18px; } .field-index span { flex-basis:100%; } .field-layer,.field-experience,.field-projects,.field-skills,.field-education,.field-volunteer { grid-column:1/-1; } section.field-layer { padding:26px 20px; border-radius:23px; } .section-note { max-width:95px; text-align:right; } .field-experience .item,.field-projects .item { display:block; } .field-experience .item .desc,.field-experience .item .tags { grid-column:auto; } .field-projects .item > .portfolio-project-art { min-height:190px; margin-bottom:18px; } .field-projects .portfolio-project-art svg { min-height:180px; } footer { width:calc(100% - 28px); } }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
+  </style>
 </head>
 
 
@@ -836,13 +933,34 @@
 
 <div class="hero">
 
+  <div class="artwork-scene artwork-scene--colorfield" aria-hidden="true">
+    <svg viewBox="0 0 600 460" role="presentation">
+      <defs>
+        <linearGradient id="fieldCoral" x1="0" x2="1" y2="1"><stop stop-color="var(--accent)"/><stop offset="1" stop-color="var(--primary)"/></linearGradient>
+        <linearGradient id="fieldLilac" x1="0" x2="1" y2="1"><stop stop-color="var(--accent-soft)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient>
+        <radialGradient id="fieldSun" cx="30%" cy="23%"><stop stop-color="var(--surface)"/><stop offset=".48" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--primary)"/></radialGradient>
+      </defs>
+      <ellipse cx="324" cy="386" rx="190" ry="24" fill="var(--primary)" opacity=".22"/>
+      <g transform="rotate(-6 325 220)">
+        <rect x="189" y="67" width="256" height="286" rx="30" fill="var(--surface)" fill-opacity=".86" stroke="var(--surface)" stroke-width="3"/>
+        <rect x="210" y="88" width="215" height="148" rx="22" fill="var(--primary)"/>
+        <path d="M210 204c43-67 79-24 113-75s71-19 102-51v158H210z" fill="url(#fieldLilac)"/>
+        <path d="M210 219c51-55 76-21 111-45s67-12 104-52v114H210z" fill="url(#fieldCoral)"/>
+        <circle cx="384" cy="137" r="25" fill="url(#fieldSun)"/>
+        <rect x="210" y="254" width="132" height="10" rx="5" fill="var(--primary)" opacity=".75"/>
+        <rect x="210" y="274" width="185" height="6" rx="3" fill="var(--primary)" opacity=".2"/>
+        <circle cx="165" cy="140" r="41" fill="url(#fieldCoral)"/>
+        <path d="M454 244l29 49h-58z" fill="var(--accent-soft)"/>
+      </g>
+    </svg>
+  </div>
+
   <div class="hero-inner">
 
     <span class="kicker">
       <span class="kicker-dot"></span>
 
-      Portfolio ·
-      <%= new Date().getFullYear() %>
+      PERSONAL ARCHIVE · <%= new Date().getFullYear() %>
 
     </span>
 
@@ -948,7 +1066,8 @@
      MAIN CONTENT
 ============================================================ -->
 
-<div class="wrap">
+<div class="wrap colorfield-canvas">
+<nav class="field-index" aria-label="Portfolio contents"><span>FIELD NOTES / CONTENTS</span><a href="#experience">01 Experience</a><a href="#projects">02 Selected work</a><a href="#skills">03 Expertise</a><a href="#education">04 Education</a><a href="#volunteering">05 Community</a></nav>
 
 
   <!-- ==========================================================
@@ -957,12 +1076,12 @@
 
   <% if (experience && experience.length) { %>
 
-    <section>
+    <section class="field-layer field-experience" id="experience">
 
-      <div class="stitle">
-        <span class="dot"></span>
-        Experience
-      </div>
+      <header class="section-heading">
+        <div><span class="section-index">FIELD / 01</span><h2 class="stitle">Experience</h2></div>
+        <span class="section-note">The path so far</span>
+      </header>
 
 
       <% experience.forEach(function(e){ %>
@@ -1051,17 +1170,19 @@
 
   <% if (projects && projects.length) { %>
 
-    <section>
+    <section class="field-layer field-projects" id="projects">
 
-      <div class="stitle">
-        <span class="dot"></span>
-        Projects
-      </div>
+      <header class="section-heading">
+        <div><span class="section-index">FIELD / 02</span><h2 class="stitle">Projects</h2></div>
+        <span class="section-note">Selected work</span>
+      </header>
 
 
       <% projects.forEach(function(p){ %>
 
         <div class="item">
+
+          <div class="portfolio-project-art" aria-hidden="true"><svg viewBox="0 0 420 160"><rect x="106" y="18" width="208" height="124" rx="22" fill="var(--primary)"/><path d="M106 106c47-60 70-18 106-57s65-10 102-41v134H106z" fill="var(--accent-soft)"/><path d="M106 123c45-39 70-14 108-34s63-10 100-39v92H106z" fill="var(--accent)"/><circle cx="272" cy="61" r="18" fill="var(--surface)"/></svg></div>
 
           <div class="row">
 
@@ -1153,12 +1274,12 @@
 
   <% if (skills && skills.length) { %>
 
-    <section>
+    <section class="field-layer field-skills" id="skills">
 
-      <div class="stitle">
-        <span class="dot"></span>
-        Skills
-      </div>
+      <header class="section-heading">
+        <div><span class="section-index">FIELD / 03</span><h2 class="stitle">Skills</h2></div>
+        <span class="section-note">Tools and disciplines</span>
+      </header>
 
 
       <div class="skills-wrap">
@@ -1185,12 +1306,12 @@
 
   <% if (education && education.length) { %>
 
-    <section>
+    <section class="field-layer field-education" id="education">
 
-      <div class="stitle">
-        <span class="dot"></span>
-        Education
-      </div>
+      <header class="section-heading">
+        <div><span class="section-index">FIELD / 04</span><h2 class="stitle">Education</h2></div>
+        <span class="section-note">Foundations</span>
+      </header>
 
 
       <% education.forEach(function(ed){ %>
@@ -1240,12 +1361,12 @@
 
   <% if (volunteer && volunteer.length) { %>
 
-    <section>
+    <section class="field-layer field-volunteer" id="volunteering">
 
-      <div class="stitle">
-        <span class="dot"></span>
-        Volunteering
-      </div>
+      <header class="section-heading">
+        <div><span class="section-index">FIELD / 05</span><h2 class="stitle">Volunteering</h2></div>
+        <span class="section-note">Community impact</span>
+      </header>
 
 
       <% volunteer.forEach(function(v){ %>
@@ -1294,7 +1415,7 @@
   <footer>
 
     <span class="footer-brand">
-      Built with Smart Portfolio Generator
+      <%= user.name %>
     </span>
 
     <span>

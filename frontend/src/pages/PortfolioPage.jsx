@@ -22,56 +22,65 @@ import Spinner from '../components/common/Spinner.jsx';
 const TEMPLATES = [
   {
     id: 'minimalist',
-    label: 'Minimalist',
-    category: 'Clean',
+    label: 'Atelier Blanc',
+    category: 'Editorial',
     blurb:
-      'Elegant typography, generous spacing and a focused single-column layout.',
+      'Quiet luxury with gallery-like spacing, fine typography and a sculptural hero.',
     preview: 'minimal',
   },
 
   {
     id: 'modern',
-    label: 'Modern',
-    category: 'Professional',
+    label: 'NOVA / 01',
+    category: 'Signature',
     blurb:
-      'A polished contemporary layout with strong hierarchy and a professional visual system.',
+      'A luminous glass interface with a dimensional profile stage and crisp project cards.',
     preview: 'modern',
   },
 
   {
     id: 'creative',
-    label: 'Creative',
-    category: 'Bold',
+    label: 'Colorfield',
+    category: 'Creative',
     blurb:
-      'Expressive typography, vibrant accents and visual sections for creative professionals.',
+      'An expressive art direction with vivid gradients, collage forms and playful composition.',
     preview: 'creative',
   },
 
   {
     id: 'tech-dark',
     label: 'Tech Dark',
-    category: 'Technical',
+    category: 'Digital',
     blurb:
-      'Dark developer-focused portfolio with terminal-inspired details and modern technical styling.',
+      'A cinematic dark interface with neon edge light, 3D data forms and terminal details.',
     preview: 'tech-dark',
   },
 
   {
     id: 'executive',
-    label: 'Executive',
-    category: 'Premium',
+    label: 'Maison No. 6',
+    category: 'Executive',
     blurb:
-      'Sophisticated editorial portfolio designed for executives, consultants and experienced professionals.',
+      'An editorial profile with refined typography, warm materials and a gold sculptural motif.',
     preview: 'executive',
   },
 
   {
     id: 'neo-brutalist',
-    label: 'Neo Brutalist',
+    label: 'OFFGRID',
     category: 'Experimental',
     blurb:
-      'Bold typography, sharp borders, high-contrast blocks and a distinctive modern brutalist aesthetic.',
+      'A graphic, art-led layout with oversized type, poster colors and sharp dimensional blocks.',
     preview: 'neo-brutalist',
+  },
+
+  {
+    id: 'ai-studio',
+    label: 'AI / 3D Studio',
+    category: 'AI Generated',
+    blurb:
+      'A cinematic portfolio world with animated 3D-style characters and glass scene panels.',
+    preview: 'ai-3d',
   },
 ];
 
@@ -141,6 +150,9 @@ const COLOR_THEMES = [
   },
 ];
 
+const API_ROOT = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api')
+  .replace(/\/api\/?$/, '');
+
 /* ============================================================
    TEMPLATE PREVIEW
 ============================================================ */
@@ -170,6 +182,10 @@ const TemplateVisual = ({ template, selected }) => {
     'neo-brutalist': {
       layout: 'brutal',
       accent: '#111827',
+    },
+    'ai-studio': {
+      layout: 'ai3d',
+      accent: '#7C8CFF',
     },
   };
 
@@ -301,6 +317,22 @@ const TemplateVisual = ({ template, selected }) => {
         </div>
       )}
 
+      {/* AI / 3D Studio */}
+      {preview.layout === 'ai3d' && (
+        <div className="relative h-full overflow-hidden bg-[#0b1020] p-3">
+          <div
+            className="absolute right-3 top-7 h-10 w-10 rounded-full blur-[1px]"
+            style={{ backgroundColor: preview.accent, opacity: 0.7 }}
+          />
+          <div className="relative z-10 h-2 w-2/3 rounded-full bg-white/90" />
+          <div className="mt-2 h-1.5 w-1/2 rounded-full bg-white/40" />
+          <div className="absolute bottom-3 left-3 right-3 grid grid-cols-2 gap-2">
+            <div className="h-8 rounded-xl border border-white/20 bg-white/10 shadow-lg backdrop-blur" />
+            <div className="h-8 rounded-xl border border-white/20 bg-white/10 shadow-lg backdrop-blur" />
+          </div>
+        </div>
+      )}
+
       {selected && (
         <div className="absolute right-2 top-7 flex h-5 w-5 items-center justify-center rounded-full bg-[#111827] text-white shadow-lg">
           <Check size={11} strokeWidth={3} />
@@ -320,6 +352,11 @@ const PortfolioPage = () => {
   const [switching, setSwitching] = useState(false);
 
   const [selectedTheme, setSelectedTheme] = useState('midnight');
+
+  const previewHtml = data?.html?.replace(
+    /<head([^>]*)>/i,
+    `<head$1><base href="${API_ROOT}/">`
+  );
 
   const load = async () => {
     setLoading(true);
@@ -1132,7 +1169,7 @@ const PortfolioPage = () => {
 
             <iframe
               title="Portfolio preview"
-              srcDoc={data?.html}
+              srcDoc={previewHtml}
               className="h-full w-full"
             />
 

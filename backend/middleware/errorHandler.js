@@ -4,6 +4,13 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
   let message = err.message || 'Internal server error';
 
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    statusCode = 413;
+    message = 'Image must be 2 MB or smaller';
+  } else if (err.name === 'MulterError' || err.message === 'Please choose a JPG, PNG, or WebP image') {
+    statusCode = 400;
+  }
+
   // Mongoose bad ObjectId
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     statusCode = 404;

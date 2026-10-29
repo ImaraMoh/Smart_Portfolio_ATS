@@ -9,7 +9,7 @@ const { syncUserOutputs } = require('../services/syncService');
 const updateProfile = asyncHandler(async (req, res) => {
   const allowedFields = [
     'name', 'headline', 'bio', 'location', 'phone', 'website',
-    'socialLinks', 'avatarUrl', 'templatePreference'
+    'socialLinks', 'templatePreference'
   ];
   const updates = {};
   allowedFields.forEach((field) => {
@@ -24,6 +24,27 @@ const updateProfile = asyncHandler(async (req, res) => {
   await syncUserOutputs(req.user.id);
 
   res.json({ success: true, message: 'Profile updated', data: user });
+});
+
+const updateAvatar = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error('Please choose a JPG, PNG, or WebP image');
+  }
+
+  const avatarUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+  const user = await User.findByIdAndUpdate(req.user.id, { avatarUrl }, {
+    new: true,
+    runValidators: true,
+  });
+  await syncUserOutputs(req.user.id);
+  res.json({ success: true, message: 'Profile photo updated', data: user });
+});
+
+const removeAvatar = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.user.id, { avatarUrl: '' }, { new: true });
+  await syncUserOutputs(req.user.id);
+  res.json({ success: true, message: 'Profile photo removed', data: user });
 });
 
 // @desc    Change the logged-in user's password
@@ -46,4 +67,4 @@ const changePassword = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Password updated successfully' });
 });
 
-module.exports = { updateProfile, changePassword };
+module.exports = { updateProfile, updateAvatar, removeAvatar, changePassword };

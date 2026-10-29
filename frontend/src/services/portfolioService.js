@@ -77,6 +77,14 @@ export const userService = {
       .put('/users/me', payload)
       .then((response) => response.data.data),
 
+  uploadAvatar: (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return api.put('/users/me/avatar', formData).then((response) => response.data.data);
+  },
+
+  removeAvatar: () => api.delete('/users/me/avatar').then((response) => response.data.data),
+
   changePassword: (payload) =>
     api
       .put('/users/me/password', payload)

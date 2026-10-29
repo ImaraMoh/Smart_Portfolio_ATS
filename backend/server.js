@@ -42,6 +42,12 @@ const apiLimiter = rateLimit({
 app.use('/api', apiLimiter);
 
 // --- Public Portfolio ---
+app.get('/portfolio-effects.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'templates', 'portfolio', 'premium-effects.js'), {
+    headers: { 'Cache-Control': 'public, max-age=86400' }
+  });
+});
+
 app.get('/p/:slug', getPublicPortfolio);
 
 // --- Static generated portfolio / cached PDFs ---

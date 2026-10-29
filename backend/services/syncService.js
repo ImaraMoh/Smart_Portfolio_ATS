@@ -16,9 +16,16 @@ const RESUME_DIR = path.join(__dirname, '..', 'generated', 'resume');
 
 const invalidateCache = async (userId) => {
   try {
-    const portfolioFile = path.join(PORTFOLIO_DIR, `${userId}.html`);
     const resumeFile = path.join(RESUME_DIR, `${userId}.pdf`);
-    if (fs.existsSync(portfolioFile)) fs.unlinkSync(portfolioFile);
+    if (fs.existsSync(PORTFOLIO_DIR)) {
+      for (const file of fs.readdirSync(PORTFOLIO_DIR)) {
+        if (file.startsWith(`${userId}-`) && file.endsWith('.html')) {
+          fs.unlinkSync(path.join(PORTFOLIO_DIR, file));
+        }
+      }
+    }
+    const legacyPortfolioFile = path.join(PORTFOLIO_DIR, `${userId}.html`);
+    if (fs.existsSync(legacyPortfolioFile)) fs.unlinkSync(legacyPortfolioFile);
     if (fs.existsSync(resumeFile)) fs.unlinkSync(resumeFile);
   } catch (err) {
     console.error(`Cache invalidation failed for user ${userId}:`, err.message);

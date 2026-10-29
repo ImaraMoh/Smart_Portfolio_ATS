@@ -1,0 +1,88 @@
+/* Shared visual polish layered onto every portfolio template. */
+:root {
+  --premium-ease: cubic-bezier(.2, .75, .2, 1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  isolation: isolate;
+  background-color: var(--background, #f8fafc);
+  background-image:
+    radial-gradient(ellipse at 8% 4%, color-mix(in srgb, var(--accent, #d4af37) 11%, transparent), transparent 34rem),
+    radial-gradient(ellipse at 94% 20%, color-mix(in srgb, var(--primary, #0b1220) 7%, transparent), transparent 32rem);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  width: min(42vw, 34rem);
+  aspect-ratio: 1;
+  top: 2vh;
+  right: -12vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #d4af37) 17%, transparent), transparent 68%);
+  filter: blur(18px);
+  opacity: .72;
+  animation: premium-drift 13s ease-in-out infinite alternate;
+}
+
+::selection { background: var(--accent, #d4af37); color: var(--primary, #101010); }
+a, button, article, .project, .project-card, .skill, .skill-chip, .item, .card {
+  -webkit-tap-highlight-color: transparent;
+}
+a, button, article, .project, .project-card, .skill, .skill-chip, .item {
+  transition-timing-function: var(--premium-ease);
+}
+
+/* Add a soft pointer-following highlight to visual cards, not text. */
+article, .project, .project-card, .item, .education, .skill, .skill-chip {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: relative;
+  transition: transform 360ms var(--premium-ease), box-shadow 360ms var(--premium-ease), border-color 260ms ease, background-color 260ms ease;
+}
+.portfolio-pointer-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(280px circle at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--accent, #d4af37) 12%, transparent), transparent 72%);
+  transition: opacity 300ms ease;
+}
+.portfolio-pointer-glow { position: absolute !important; z-index: 0 !important; }
+article:hover > .portfolio-pointer-glow, .project:hover > .portfolio-pointer-glow, .project-card:hover > .portfolio-pointer-glow, .item:hover > .portfolio-pointer-glow, .education:hover > .portfolio-pointer-glow { opacity: 1; }
+article:hover, .project:hover, .project-card:hover, .item:hover, .education:hover { transform: translateY(-5px); }
+.skill:hover, .skill-chip:hover { transform: translateY(-3px) scale(1.025); }
+
+/* Keep card content above the highlight overlay. */
+article > *, .project > *, .project-card > *, .item > *, .education > * { position: relative; z-index: 1; }
+.hero, .header { isolation: isolate; }
+.hero::before, .hero::after, .shape-one, .shape-two, .shape-three, .hero-panel, .terminal {
+  animation: premium-float 8s ease-in-out infinite;
+}
+.hero::after, .shape-two { animation-delay: -3.2s; }
+.shape-three { animation-delay: -5.4s; }
+.hero-panel, .terminal { animation-duration: 7s; }
+
+html.motion-ready .portfolio-reveal {
+  opacity: 0;
+  transform: translateY(22px) scale(.985);
+  transition: opacity 650ms var(--premium-ease), transform 650ms var(--premium-ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html.motion-ready .portfolio-reveal.is-visible { opacity: 1; transform: none; }
+
+@keyframes premium-drift { to { transform: translate3d(-8vw, 8vh, 0) scale(1.13); } }
+@keyframes premium-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes premium-gradient { to { background-position: 100% 50%; } }
+@keyframes premium-grid { to { background-position: 48px 48px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  html.motion-ready .portfolio-reveal { opacity: 1; transform: none; }
+}

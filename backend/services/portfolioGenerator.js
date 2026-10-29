@@ -16,6 +16,7 @@
  * - tech-dark
  * - executive
  * - neo-brutalist
+ * - ai-studio
  *
  * Available Color Themes:
  * - midnight
@@ -65,6 +66,7 @@ const TEMPLATE_MAP = {
   'tech-dark': 'tech-dark.ejs',
   executive: 'executive.ejs',
   'neo-brutalist': 'neo-brutalist.ejs',
+  'ai-studio': 'ai-studio.ejs',
 };
 
 /*
@@ -89,6 +91,10 @@ const COLOR_THEMES = {
     accent: '#D4AF37',
     background: '#F8FAFC',
     text: '#111827',
+    surface: '#FFFFFF',
+    muted: '#64748B',
+    border: '#E2E8F0',
+    softAccent: '#F4F0E5',
   },
 
   ocean: {
@@ -97,6 +103,10 @@ const COLOR_THEMES = {
     accent: '#20C4CB',
     background: '#F4FAFC',
     text: '#102A43',
+    surface: '#FFFFFF',
+    muted: '#547080',
+    border: '#D8E7EC',
+    softAccent: '#E7F6F6',
   },
 
   emerald: {
@@ -105,6 +115,10 @@ const COLOR_THEMES = {
     accent: '#2BB673',
     background: '#F5FAF8',
     text: '#17201D',
+    surface: '#FFFFFF',
+    muted: '#5C7267',
+    border: '#DCE8E1',
+    softAccent: '#E6F3EC',
   },
 
   royal: {
@@ -113,6 +127,10 @@ const COLOR_THEMES = {
     accent: '#8B5CF6',
     background: '#FAF8FF',
     text: '#18122B',
+    surface: '#FFFFFF',
+    muted: '#6F6685',
+    border: '#E6E0F2',
+    softAccent: '#F0EAFE',
   },
 
   rose: {
@@ -121,6 +139,10 @@ const COLOR_THEMES = {
     accent: '#F43F5E',
     background: '#FFF7F8',
     text: '#26151A',
+    surface: '#FFFFFF',
+    muted: '#80636B',
+    border: '#EEDFE2',
+    softAccent: '#FCEBED',
   },
 
   amber: {
@@ -129,6 +151,10 @@ const COLOR_THEMES = {
     accent: '#F59E0B',
     background: '#FFFBF2',
     text: '#241A0A',
+    surface: '#FFFFFF',
+    muted: '#766A53',
+    border: '#EAE2D2',
+    softAccent: '#F8F0DD',
   },
 };
 
@@ -140,6 +166,12 @@ const COLOR_THEMES = {
 
 const DEFAULT_TEMPLATE = 'modern';
 const DEFAULT_THEME = 'midnight';
+const DESIGN_VERSION = 'template-refresh-v28';
+const PREMIUM_EFFECTS_CSS = fs.readFileSync(
+  path.join(TEMPLATE_DIR, 'premium-effects.css'),
+  'utf-8'
+);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -287,7 +319,7 @@ const generatePortfolio = async (
   */
 
   const cacheKey =
-    `${userId}-${selectedTemplate}-${selectedTheme}`;
+    `${userId}-${selectedTemplate}-${selectedTheme}-${DESIGN_VERSION}`;
 
   const cachedPath = path.join(
     OUTPUT_DIR,
@@ -328,7 +360,7 @@ const generatePortfolio = async (
   |--------------------------------------------------------------------------
   */
 
-  const html = await ejs.renderFile(
+  let html = await ejs.renderFile(
     templatePath,
     {
       /*
@@ -406,6 +438,19 @@ const generatePortfolio = async (
     }
   );
 
+  html = html
+    .replace('</head>', `  <style>${PREMIUM_EFFECTS_CSS}</style>\n</head>`)
+    .replace(/<body([^>]*)>/i, `<body$1 data-portfolio-template="${selectedTemplate}">`)
+    .replace('</body>', '  <script src="/portfolio-effects.js" defer></script>\n</body>');
+
+
+  if (profile.user.avatarUrl) {
+    const safeAvatarUrl = String(profile.user.avatarUrl).replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[char]);
+    html = html.replace('</body>', `  <style>.portfolio-profile-photo{position:absolute;z-index:20;top:82px;right:clamp(22px,7vw,100px);width:clamp(74px,10vw,124px);height:clamp(74px,10vw,124px);object-fit:cover;border-radius:50%;border:3px solid var(--accent,#d4af37);box-shadow:0 12px 36px #0003;background:var(--surface,#fff)}@media(max-width:600px){.portfolio-profile-photo{top:76px;right:20px;width:64px;height:64px}}</style>\n  <img class="portfolio-profile-photo" src="${safeAvatarUrl}" alt="${String(profile.user.name).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char])} profile photo">\n</body>`);
+  }
+
   /*
   |--------------------------------------------------------------------------
   | Save Generated Portfolio
@@ -452,3 +497,4 @@ module.exports = {
   DEFAULT_TEMPLATE,
   DEFAULT_THEME,
 };
+

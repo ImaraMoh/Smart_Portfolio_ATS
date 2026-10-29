@@ -24,6 +24,7 @@ const ALLOWED_TEMPLATES = [
   'tech-dark',
   'executive',
   'neo-brutalist',
+  'ai-studio',
 ];
 
 const ALLOWED_COLOR_THEMES = [

@@ -21,4 +21,14 @@ const uploadResume = multer({
   },
 });
 
+const uploadAvatar = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (/^image\/(jpeg|png|webp)$/.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Please choose a JPG, PNG, or WebP image'), false);
+  },
+  limits: { fileSize: 2 * 1024 * 1024 },
+});
+
 module.exports = uploadResume;
+module.exports.uploadAvatar = uploadAvatar;
