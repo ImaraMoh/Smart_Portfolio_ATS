@@ -88,7 +88,10 @@ const getMyPortfolio = asyncHandler(async (req, res) => {
   const {
     html,
     fromCache,
-  } = await generatePortfolio(user._id);
+  } = await generatePortfolio(user._id, {
+    templatePreference,
+    colorTheme,
+  });
 
   res.json({
     success: true,

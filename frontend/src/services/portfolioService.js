@@ -1,4 +1,7 @@
 import api from './api';
+import { fetchCached, getCached, invalidateCached } from './queryCache';
+
+const PORTFOLIO_CACHE_KEY = 'portfolio:mine';
 
 /* ============================================================
    PORTFOLIO SERVICE
@@ -6,32 +9,31 @@ import api from './api';
 
 export const portfolioService = {
   /* Get current user's portfolio */
-  getMine: () =>
-    api
-      .get('/portfolio/me')
-      .then((response) => response.data.data),
+  getMine: () => {
+    const cached = getCached(PORTFOLIO_CACHE_KEY);
+    if (cached) return Promise.resolve(cached);
+    return fetchCached(PORTFOLIO_CACHE_KEY, () =>
+      api.get('/portfolio/me').then((response) => response.data.data)
+    );
+  },
 
   /* Regenerate portfolio */
-  regenerate: () =>
-    api
-      .post('/portfolio/regenerate')
-      .then((response) => response.data.data),
+  regenerate: () => api.post('/portfolio/regenerate').then((response) => {
+    invalidateCached(PORTFOLIO_CACHE_KEY);
+    return response.data.data;
+  }),
 
   /* Change portfolio template */
-  setTemplate: (templatePreference) =>
-    api
-      .put('/portfolio/template', {
-        templatePreference,
-      })
-      .then((response) => response.data.data),
+  setTemplate: (templatePreference) => api.put('/portfolio/template', { templatePreference }).then((response) => {
+    invalidateCached(PORTFOLIO_CACHE_KEY);
+    return response.data.data;
+  }),
 
   /* Change portfolio color theme */
-  setColorTheme: (colorTheme) =>
-    api
-      .put('/portfolio/color-theme', {
-        colorTheme,
-      })
-      .then((response) => response.data.data),
+  setColorTheme: (colorTheme) => api.put('/portfolio/color-theme', { colorTheme }).then((response) => {
+    invalidateCached(PORTFOLIO_CACHE_KEY);
+    return response.data.data;
+  }),
 };
 
 /* ============================================================
@@ -72,18 +74,24 @@ export const atsService = {
 ============================================================ */
 
 export const userService = {
-  updateProfile: (payload) =>
-    api
-      .put('/users/me', payload)
-      .then((response) => response.data.data),
+  updateProfile: (payload) => api.put('/users/me', payload).then((response) => {
+    invalidateCached(PORTFOLIO_CACHE_KEY);
+    return response.data.data;
+  }),
 
   uploadAvatar: (file) => {
     const formData = new FormData();
     formData.append('avatar', file);
-    return api.put('/users/me/avatar', formData).then((response) => response.data.data);
+    return api.put('/users/me/avatar', formData).then((response) => {
+      invalidateCached(PORTFOLIO_CACHE_KEY);
+      return response.data.data;
+    });
   },
 
-  removeAvatar: () => api.delete('/users/me/avatar').then((response) => response.data.data),
+  removeAvatar: () => api.delete('/users/me/avatar').then((response) => {
+    invalidateCached(PORTFOLIO_CACHE_KEY);
+    return response.data.data;
+  }),
 
   changePassword: (payload) =>
     api

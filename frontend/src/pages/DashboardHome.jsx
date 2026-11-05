@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getCached, hasCached, setCached } from '../services/queryCache.js';
 import Card from '../components/common/Card.jsx';
 import Spinner from '../components/common/Spinner.jsx';
 import {
@@ -76,9 +77,16 @@ const STAT_LINKS = [
   }
 ];
 
+const getCachedCounts = () => {
+  const counts = getCached('dashboard:counts');
+  if (counts) return counts;
+  if (!STAT_LINKS.every((section) => hasCached(section.service.cacheKey))) return null;
+  return Object.fromEntries(STAT_LINKS.map((section) => [section.key, getCached(section.service.cacheKey).length]));
+};
+
 const DashboardHome = () => {
   const { user } = useAuth();
-  const [counts, setCounts] = useState(null);
+  const [counts, setCounts] = useState(getCachedCounts);
 
   useEffect(() => {
     const load = async () => {
@@ -92,6 +100,7 @@ const DashboardHome = () => {
         c[s.key] = results[i].length;
       });
 
+      setCached('dashboard:counts', c);
       setCounts(c);
     };
 

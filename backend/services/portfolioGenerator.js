@@ -30,6 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
+const User = require('../models/User');
 
 const { getFullProfile } = require('./careerDataService');
 
@@ -233,45 +234,21 @@ const resolveColorTheme = (colorTheme) => {
 |--------------------------------------------------------------------------
 */
 
-const generatePortfolio = async (
+const generatePortfolioInternal = async (
   userId,
-  { force = false } = {}
+  { force = false, templatePreference: requestedTemplate, colorTheme: requestedTheme } = {}
 ) => {
   ensureDir(OUTPUT_DIR);
 
-  /*
-  |--------------------------------------------------------------------------
-  | Load Complete Profile
-  |--------------------------------------------------------------------------
-  */
+  // Resolve the cache key from the small user record first. The expensive
+  // career collections are only loaded when we actually need to render HTML.
+  const preferences = requestedTemplate && requestedTheme
+    ? { templatePreference: requestedTemplate, colorTheme: requestedTheme }
+    : await User.findById(userId).select('templatePreference colorTheme').lean();
+  if (!preferences) throw new Error('Unable to generate portfolio: user profile not found');
 
-  const profile = await getFullProfile(userId);
-
-  if (!profile || !profile.user) {
-    throw new Error(
-      'Unable to generate portfolio: user profile not found'
-    );
-  }
-
-  /*
-  |--------------------------------------------------------------------------
-  | Resolve Template
-  |--------------------------------------------------------------------------
-  */
-
-  const selectedTemplate = resolveTemplate(
-    profile.user.templatePreference
-  );
-
-  /*
-  |--------------------------------------------------------------------------
-  | Resolve Theme
-  |--------------------------------------------------------------------------
-  */
-
-  const selectedTheme = resolveColorTheme(
-    profile.user.colorTheme
-  );
+  const selectedTemplate = resolveTemplate(preferences.templatePreference);
+  const selectedTheme = resolveColorTheme(preferences.colorTheme);
 
   const theme = COLOR_THEMES[selectedTheme];
 
@@ -352,6 +329,11 @@ const generatePortfolio = async (
 
       theme,
     };
+  }
+
+  const profile = await getFullProfile(userId);
+  if (!profile || !profile.user) {
+    throw new Error('Unable to generate portfolio: user profile not found');
   }
 
   /*
@@ -482,6 +464,16 @@ const generatePortfolio = async (
 
     theme,
   };
+};
+
+const generationInFlight = new Map();
+const generatePortfolio = (userId, options = {}) => {
+  const key = String(userId);
+  if (generationInFlight.has(key)) return generationInFlight.get(key);
+  const task = generatePortfolioInternal(userId, options)
+    .finally(() => generationInFlight.delete(key));
+  generationInFlight.set(key, task);
+  return task;
 };
 
 /*

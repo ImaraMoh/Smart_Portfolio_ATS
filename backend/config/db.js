@@ -8,7 +8,11 @@ const connectDB = async () => {
       return;
     }
     const conn = await mongoose.connect(uri, {
-      autoIndex: true
+      autoIndex: true,
+      maxPoolSize: 20,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      bufferTimeoutMS: 10000,
     });
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (err) {

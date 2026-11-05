@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
   Upload,
@@ -15,9 +15,19 @@ import {
   X,
   Loader2,
   FileCheck2,
+  LayoutGrid,
+  List,
+  Table2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 import { atsService } from '../services/portfolioService';
+import { getCached, hasCached, setCached } from '../services/queryCache.js';
+
+const ATS_WORKSPACE_CACHE_KEY = 'ats:workspace';
+const ATS_HISTORY_CACHE_KEY = 'ats:history';
+const savedWorkspace = getCached(ATS_WORKSPACE_CACHE_KEY);
 
 /* ============================================================
    SCORE GAUGE
@@ -417,20 +427,50 @@ const KeywordGroup = ({
 ============================================================ */
 
 const ATSScorePage = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => savedWorkspace?.form || ({
     jobTitle: '',
     company: '',
     jobDescriptionText: '',
-  });
+  }));
 
   const [resumeSource, setResumeSource] =
-    useState('generated');
+    useState(savedWorkspace?.resumeSource === 'upload' ? 'generated' : savedWorkspace?.resumeSource || 'generated');
 
   const [resumeFile, setResumeFile] =
     useState(null);
 
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(() => savedWorkspace?.result || null);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState(() => getCached(ATS_HISTORY_CACHE_KEY) || []);
+  const [historyLoading, setHistoryLoading] = useState(() => !hasCached(ATS_HISTORY_CACHE_KEY));
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyView, setHistoryView] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ats-history:view');
+      return ['grid', 'list', 'table'].includes(saved) ? saved : 'list';
+    } catch { return 'list'; }
+  });
+  const [historyPageSize, setHistoryPageSize] = useState(10);
+
+  const loadHistory = useCallback(async () => {
+    try {
+      const data = await atsService.history();
+      setCached(ATS_HISTORY_CACHE_KEY, data);
+      setHistory(data);
+    } catch {
+      // Keep the last cached history visible if a background refresh fails.
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
+
+  useEffect(() => {
+    setCached(ATS_WORKSPACE_CACHE_KEY, { form, resumeSource, result });
+  }, [form, resumeSource, result]);
 
   /* ==========================================================
      SUBMIT
@@ -489,6 +529,7 @@ const ATSScorePage = () => {
       });
 
       setResult(data);
+      loadHistory();
 
       toast.success(
         'ATS analysis completed successfully.'
@@ -541,6 +582,14 @@ const ATSScorePage = () => {
             color: 'text-red-600',
             bg: 'bg-red-50',
           };
+
+  const historyPageCount = Math.max(1, Math.ceil(history.length / historyPageSize));
+  const visibleHistory = history.slice((historyPage - 1) * historyPageSize, historyPage * historyPageSize);
+  const changeHistoryView = (nextView) => {
+    setHistoryView(nextView);
+    setHistoryPage(1);
+    try { localStorage.setItem('ats-history:view', nextView); } catch { /* Preference storage is optional. */ }
+  };
 
   return (
     <div className="min-h-full pb-12">
@@ -1058,6 +1107,61 @@ const ATSScorePage = () => {
 
         </section>
       </div>
+
+      <section className="mt-7 overflow-hidden rounded-[24px] border border-gray-200/80 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
+        <div className="flex flex-col gap-4 border-b border-gray-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <p className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-gray-400">Your past analyses</p>
+            <h2 className="mt-1 font-display text-lg font-semibold text-[#0B1220]">ATS score history <span className="ml-1 text-sm font-medium text-gray-400">{history.length}</span></h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1" role="group" aria-label="History view">
+              {[
+                { id: 'grid', label: 'Cards', Icon: LayoutGrid },
+                { id: 'list', label: 'List', Icon: List },
+                { id: 'table', label: 'Table', Icon: Table2 },
+              ].map(({ id, label, Icon }) => (
+                <button key={id} type="button" onClick={() => changeHistoryView(id)} aria-pressed={historyView === id} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[10px] font-semibold transition ${historyView === id ? 'bg-white text-[#0B1220] shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-[#0B1220]'}`}>
+                  <Icon size={13} /> <span>{label}</span>
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-[10px] text-gray-500">Rows
+              <select value={historyPageSize} onChange={(event) => { setHistoryPageSize(Number(event.target.value)); setHistoryPage(1); }} className="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-[#0B1220] outline-none focus:border-[#D4AF37]">
+                {[10, 20, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        {historyLoading && history.length === 0 ? (
+          <div className="flex min-h-32 items-center justify-center text-xs text-gray-400">Loading analysis history…</div>
+        ) : history.length === 0 ? (
+          <div className="px-6 py-12 text-center text-xs text-gray-400">Completed analyses will appear here.</div>
+        ) : historyView === 'table' ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100 text-left">
+              <thead className="bg-gray-50/70"><tr><th className="px-5 py-3 font-mono text-[9px] uppercase tracking-wider text-gray-500">Target role</th><th className="px-5 py-3 font-mono text-[9px] uppercase tracking-wider text-gray-500">Company</th><th className="px-5 py-3 font-mono text-[9px] uppercase tracking-wider text-gray-500">Match score</th><th className="px-5 py-3 font-mono text-[9px] uppercase tracking-wider text-gray-500">Date</th></tr></thead>
+              <tbody className="divide-y divide-gray-100">{visibleHistory.map((entry) => {
+                const job = entry.jobDescriptionId || {};
+                return <tr key={entry._id} className="hover:bg-amber-50/30"><td className="px-5 py-3.5 text-xs font-semibold text-[#0B1220]">{job.jobTitle || 'Untitled role'}</td><td className="px-5 py-3.5 text-xs text-gray-600">{job.company || '—'}</td><td className="px-5 py-3.5"><span className="rounded-full bg-[#D4AF37]/10 px-2.5 py-1 text-[10px] font-bold text-[#8E6F14]">{Math.round(entry.score)}%</span></td><td className="whitespace-nowrap px-5 py-3.5 text-xs text-gray-500">{entry.computedAt ? new Date(entry.computedAt).toLocaleDateString() : '—'}</td></tr>;
+              })}</tbody>
+            </table>
+          </div>
+        ) : (
+          <div className={historyView === 'grid' ? 'grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3' : 'divide-y divide-gray-100'}>
+            {visibleHistory.map((entry) => {
+              const job = entry.jobDescriptionId || {};
+              return <article key={entry._id} className={historyView === 'grid' ? 'rounded-2xl border border-gray-200/80 p-4' : 'flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between'}>
+                <div className="min-w-0"><h3 className="truncate text-xs font-semibold text-[#0B1220]">{job.jobTitle || 'Untitled role'}</h3><p className="mt-1 truncate text-[10px] text-gray-500">{job.company || 'Company not specified'} · {entry.computedAt ? new Date(entry.computedAt).toLocaleDateString() : 'Date unavailable'}</p></div>
+                <div className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[#D4A24E]" /><span className="text-[10px] text-gray-500">{entry.matchedKeywords?.length || 0} matched</span><span className="ml-auto rounded-full bg-[#D4AF37]/10 px-2.5 py-1 text-[10px] font-bold text-[#8E6F14]">{Math.round(entry.score)}%</span></div>
+              </article>;
+            })}
+          </div>
+        )}
+
+        {history.length > 0 && <div className="flex flex-col gap-3 border-t border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-[10px] text-gray-500">Page <strong className="text-[#0B1220]">{historyPage}</strong> of <strong className="text-[#0B1220]">{historyPageCount}</strong> · {history.length} analyses</p><div className="flex items-center gap-2 self-end sm:self-auto"><button type="button" onClick={() => setHistoryPage((current) => Math.max(1, current - 1))} disabled={historyPage === 1} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 px-3 text-xs text-gray-600 disabled:opacity-40"><ChevronLeft size={14} />Previous</button><button type="button" onClick={() => setHistoryPage((current) => Math.min(historyPageCount, current + 1))} disabled={historyPage === historyPageCount} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 px-3 text-xs text-gray-600 disabled:opacity-40">Next<ChevronRight size={14} /></button></div></div>}
+      </section>
 
       {/* ======================================================
           FOOTER TIP

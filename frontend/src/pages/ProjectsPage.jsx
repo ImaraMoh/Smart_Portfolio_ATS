@@ -19,7 +19,7 @@ const fields = [
     name: 'title',
     label: 'Project Title',
     required: true,
-    placeholder: 'Smart Portfolio Generator',
+    placeholder: 'Folio demo project',
   },
   {
     name: 'description',

@@ -646,7 +646,7 @@ const ResumePage = () => {
             <p className="mt-1 max-w-3xl text-xs leading-5 text-gray-500">
               Upload your existing CV first. The system can identify
               important sections and help you bring missing information
-              into your Smart Portfolio profile before generating a
+              into your Folio profile before generating a
               fresh ATS-friendly resume.
             </p>
 

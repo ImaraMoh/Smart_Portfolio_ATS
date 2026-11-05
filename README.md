@@ -1,4 +1,4 @@
-# Smart Portfolio Generator & ATS-Scored Resume Generator
+# Folio — Career Portfolio & ATS Resume Studio
 
 A full-stack MERN application with a Python/Flask ML microservice. Users manage
 their career data (education, experience, skills, projects, volunteering) in
@@ -125,3 +125,15 @@ Runs on `http://localhost:5173`.
   included in this scaffold.
 - Review the rate limiting and CORS origin settings in `backend/server.js`
   for your actual production domain(s).
+
+### Password reset email
+
+Password recovery sends a six-digit verification code over SMTP. Configure
+`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, and `FROM_EMAIL`
+in `backend/.env` for local development. For Gmail, use `smtp.gmail.com` on port
+587 with an App Password (regular account passwords are not accepted by Google).
+Codes expire after 10 minutes, attempts are rate-limited, and only hashed codes
+and reset tokens are stored in MongoDB. For Docker Compose, copy the root
+`.env.example` to `.env`; Compose passes those settings to the backend. Rebuild
+the backend after changing routes or email settings with
+`docker compose up --build backend`.

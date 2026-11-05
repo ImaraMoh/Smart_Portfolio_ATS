@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
@@ -8,11 +8,16 @@ import {
   Sparkles,
   Database,
   ChevronRight,
+  ChevronLeft,
+  LayoutGrid,
+  List,
+  Table2,
   X,
 } from 'lucide-react';
 
 import Spinner from '../common/Spinner.jsx';
 import EntityForm from './EntityForm.jsx';
+import { getCached, hasCached } from '../../services/queryCache.js';
 
 const EntitySection = ({
   title,
@@ -23,24 +28,64 @@ const EntitySection = ({
   emptyLabel,
   layout = 'list',
 }) => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState(() => getCached(service.cacheKey) || []);
+  const hasVisibleData = useRef(hasCached(service.cacheKey));
+  const [loading, setLoading] = useState(() => !hasCached(service.cacheKey));
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const isGrid = layout === 'grid';
+  const [view, setView] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`${service.cacheKey}:view`);
+      return ['grid', 'list', 'table'].includes(saved) ? saved : layout;
+    } catch { return layout; }
+  });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const isGrid = view === 'grid';
+  const isTable = view === 'table';
+  const tableFields = useMemo(
+    () => fields.filter((field) => !['textarea', 'tags'].includes(field.type)).slice(0, 6),
+    [fields]
+  );
+  const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+  const visibleItems = useMemo(
+    () => items.slice((page - 1) * pageSize, page * pageSize),
+    [items, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, pageCount));
+  }, [pageCount]);
+
+  const changeView = (nextView) => {
+    setView(nextView);
+    setPage(1);
+    try { localStorage.setItem(`${service.cacheKey}:view`, nextView); } catch { /* Preferences are optional. */ }
+  };
+
+  const displayCell = (item, field) => {
+    const value = item[field.name];
+    if (field.type === 'checkbox') return value ? 'Yes' : 'No';
+    if (value === undefined || value === null || value === '') return '—';
+    if (Array.isArray(value)) return value.join(', ') || '—';
+    if (field.type === 'date' && value) return new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    return String(value).replaceAll('-', ' ');
+  };
 
   const load = useCallback(async () => {
-    setLoading(true);
+    if (!hasVisibleData.current) setLoading(true);
 
     try {
       const data = await service.list();
       setItems(data);
+      hasVisibleData.current = true;
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || 'Failed to load data'
-      );
+      if (!hasVisibleData.current) {
+        toast.error(err.response?.data?.message || 'Failed to load data');
+      }
     } finally {
       setLoading(false);
     }
@@ -217,6 +262,33 @@ const EntitySection = ({
       ===================================================== */}
       <div className="p-5 sm:p-7">
 
+        {!loading && items.length > 0 && (
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted">
+              Showing <span className="font-semibold text-ink">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, items.length)}</span> of <span className="font-semibold text-ink">{items.length}</span> records
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1" role="group" aria-label="Record view">
+                {[
+                  { id: 'grid', label: 'Cards', Icon: LayoutGrid },
+                  { id: 'list', label: 'List', Icon: List },
+                  { id: 'table', label: 'Table', Icon: Table2 },
+                ].map(({ id, label, Icon }) => (
+                  <button key={id} type="button" onClick={() => changeView(id)} aria-pressed={view === id} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[10px] font-semibold transition sm:px-3 ${view === id ? 'bg-white text-ink shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-ink'}`}>
+                    <Icon size={13} /> <span>{label}</span>
+                  </button>
+                ))}
+              </div>
+              <label className="flex items-center gap-2 text-[10px] text-muted">
+                Rows
+                <select value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(1); }} className="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-ink outline-none focus:border-gold">
+                  {[10, 20, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+                </select>
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* =====================================================
             LOADING
         ===================================================== */}
@@ -302,8 +374,31 @@ const EntitySection = ({
 
           </div>
 
+        ) : isTable ? (
+          <div className="overflow-x-auto rounded-2xl border border-gray-200/80 bg-white">
+            <table className="min-w-full divide-y divide-gray-100 text-left">
+              <thead className="bg-gray-50/80">
+                <tr>
+                  {tableFields.map((field) => <th key={field.name} scope="col" className="whitespace-nowrap px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-wider text-gray-500">{field.label}</th>)}
+                  <th scope="col" className="px-4 py-3 text-right font-mono text-[9px] font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {visibleItems.map((item) => (
+                  <tr key={item._id} className="transition hover:bg-amber-50/30">
+                    {tableFields.map((field) => <td key={field.name} title={displayCell(item, field)} className="max-w-[260px] truncate px-4 py-3.5 text-xs capitalize text-gray-700">{displayCell(item, field)}</td>)}
+                    <td className="whitespace-nowrap px-4 py-2 text-right">
+                      <div className="inline-flex items-center gap-1">
+                        <button type="button" onClick={() => openEdit(item)} title="Edit" aria-label="Edit record" className="grid h-8 w-8 place-items-center rounded-lg text-gray-400 transition hover:bg-ink hover:text-white"><Pencil size={13} /></button>
+                        <button type="button" onClick={() => handleDelete(item)} title="Delete" aria-label="Delete record" className="grid h-8 w-8 place-items-center rounded-lg text-gray-400 transition hover:bg-red-50 hover:text-red-600"><Trash2 size={13} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-
           /* =================================================
              RECORDS
 
@@ -323,7 +418,7 @@ const EntitySection = ({
             }
           >
 
-            {items.map((item, index) => (
+            {visibleItems.map((item, index) => (
 
               <div
                 key={item._id}
@@ -400,7 +495,7 @@ const EntitySection = ({
 
                     {isGrid && (
                       <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-gray-300">
-                        Record {String(index + 1).padStart(2, '0')}
+                        Record {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
                       </span>
                     )}
 
@@ -459,7 +554,7 @@ const EntitySection = ({
                   <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
 
                     <span className="font-mono text-[9px] uppercase tracking-widest text-gray-300">
-                      Record {String(index + 1).padStart(2, '0')}
+                      Record {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
                     </span>
 
                     <ChevronRight
@@ -476,6 +571,16 @@ const EntitySection = ({
 
           </div>
 
+        )}
+
+        {!loading && items.length > 0 && (
+          <div className="mt-5 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[10px] text-muted">Page <span className="font-semibold text-ink">{page}</span> of <span className="font-semibold text-ink">{pageCount}</span></p>
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"><ChevronLeft size={14} /> Previous</button>
+              <button type="button" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40">Next <ChevronRight size={14} /></button>
+            </div>
+          </div>
         )}
 
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import {
   Check,
@@ -14,6 +14,9 @@ import {
 
 import { portfolioService } from '../services/portfolioService';
 import Spinner from '../components/common/Spinner.jsx';
+import { getCached, hasCached } from '../services/queryCache.js';
+
+const PORTFOLIO_CACHE_KEY = 'portfolio:mine';
 
 /* ============================================================
    PREMIUM PORTFOLIO TEMPLATES
@@ -347,11 +350,12 @@ const TemplateVisual = ({ template, selected }) => {
 ============================================================ */
 
 const PortfolioPage = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(() => getCached(PORTFOLIO_CACHE_KEY) || null);
+  const hasVisibleData = useRef(hasCached(PORTFOLIO_CACHE_KEY));
+  const [loading, setLoading] = useState(() => !hasCached(PORTFOLIO_CACHE_KEY));
   const [switching, setSwitching] = useState(false);
 
-  const [selectedTheme, setSelectedTheme] = useState('midnight');
+  const [selectedTheme, setSelectedTheme] = useState(() => getCached(PORTFOLIO_CACHE_KEY)?.colorTheme || 'midnight');
 
   const previewHtml = data?.html?.replace(
     /<head([^>]*)>/i,
@@ -359,21 +363,19 @@ const PortfolioPage = () => {
   );
 
   const load = async () => {
-    setLoading(true);
+    if (!hasVisibleData.current) setLoading(true);
 
     try {
       const d = await portfolioService.getMine();
 
       setData(d);
+      hasVisibleData.current = true;
 
       if (d?.colorTheme) {
         setSelectedTheme(d.colorTheme);
       }
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-          'Failed to load portfolio'
-      );
+      if (!hasVisibleData.current) toast.error(err.response?.data?.message || 'Failed to load portfolio');
     } finally {
       setLoading(false);
     }
@@ -504,7 +506,7 @@ const PortfolioPage = () => {
             />
 
             <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
-              Portfolio Studio
+              Folio Studio
             </span>
 
           </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import FolioBrand from '../common/FolioBrand.jsx';
 
 import {
   LayoutDashboard,
@@ -147,33 +148,7 @@ const Sidebar = ({ collapsed, onCollapsedChange }) => {
 
         {/* Brand */}
 
-        <div className="flex items-center gap-2.5">
-          <div
-            className="
-              flex
-              h-9
-              w-9
-              items-center
-              justify-center
-              rounded-xl
-              bg-[#0A0F1B]
-              text-[#D4AF37]
-              shadow-sm
-            "
-          >
-            <Sparkles size={15} />
-          </div>
-
-          <div className="leading-none">
-            <p className="font-mono text-[7px] uppercase tracking-[0.22em] text-gray-400">
-              SP / ATS
-            </p>
-
-            <p className="mt-1 text-[11px] font-semibold text-[#0A0F1B]">
-              Portfolio Studio
-            </p>
-          </div>
-        </div>
+        <FolioBrand className="lp-brand folio-shell-brand" iconSize={16} />
 
         {/* User */}
 
@@ -278,43 +253,11 @@ const Sidebar = ({ collapsed, onCollapsedChange }) => {
               ${collapsed ? 'justify-center' : 'px-5'}
             `}
           >
-            <div className="flex items-center gap-3">
-              {/* Logo */}
-
-              <div
-                className="
-                  relative
-                  flex
-                  h-10
-                  w-10
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-[14px]
-                  bg-[#D4AF37]/10
-                "
-              >
-                <div className="absolute inset-0 rounded-[14px] bg-[#D4AF37]/10 blur-xl" />
-
-                <Sparkles
-                  size={17}
-                  strokeWidth={1.8}
-                  className="relative text-[#D4AF37]"
-                />
+            {collapsed ? (
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#D4AF37]/10 text-[#D4AF37]">
+                <Sparkles size={17} strokeWidth={1.8} />
               </div>
-
-              {!collapsed && (
-                <div>
-                  <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-[#D4AF37]">
-                    Smart Portfolio
-                  </p>
-
-                  <p className="mt-1 text-sm font-semibold tracking-tight text-white">
-                    ATS Studio
-                  </p>
-                </div>
-              )}
-            </div>
+            ) : <FolioBrand className="lp-brand folio-sidebar-brand" iconSize={17} />}
 
             {/* Mobile close */}
 
@@ -384,7 +327,7 @@ const Sidebar = ({ collapsed, onCollapsedChange }) => {
                   </p>
 
                   <p className="mt-0.5 truncate text-[10px] text-white/55">
-                    {user?.email || 'Portfolio account'}
+                    {user?.email || 'Folio account'}
                   </p>
                 </div>
               </div>

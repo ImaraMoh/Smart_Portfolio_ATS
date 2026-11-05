@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { authService } from '../services/authService';
 import api, { setAccessToken, setUnauthorizedHandler } from '../services/api';
+import { clearQueryCache } from '../services/queryCache.js';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const logout = useCallback(() => {
+    clearQueryCache();
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem('refreshToken');
@@ -31,8 +33,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data } = await api.post('/auth/refresh', { refreshToken });
         setAccessToken(data.data.accessToken);
-        const me = await authService.me();
-        setUser(me);
+        setUser(data.data.user);
       } catch {
         localStorage.removeItem('refreshToken');
       } finally {
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const data = await authService.login({ email, password });
+    clearQueryCache();
     setAccessToken(data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setUser(data.user);
@@ -52,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     const data = await authService.register({ name, email, password });
+    clearQueryCache();
     setAccessToken(data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setUser(data.user);

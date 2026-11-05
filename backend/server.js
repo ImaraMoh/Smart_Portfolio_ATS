@@ -81,7 +81,7 @@ const PORT = process.env.PORT || 5000;
 const start = async () => {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`Smart Portfolio & ATS backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+    console.log(`Folio API running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
   });
 };
 

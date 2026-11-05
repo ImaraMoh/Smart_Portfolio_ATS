@@ -6,6 +6,8 @@ import DashboardShell from './components/layout/DashboardShell.jsx';
 
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 import Register from './pages/Register.jsx';
 import DashboardHome from './pages/DashboardHome.jsx';
 import EducationPage from './pages/EducationPage.jsx';
@@ -23,6 +25,8 @@ const App = () => (
   <Routes>
     <Route path="/" element={<Landing />} />
     <Route path="/login" element={<Login />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/register" element={<Register />} />
 
     <Route

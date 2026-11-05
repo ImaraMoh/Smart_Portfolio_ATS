@@ -2,7 +2,10 @@ import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-const api = axios.create({ baseURL: BASE_URL });
+// Keep request feedback bounded so a stalled backend never leaves a page
+// spinning indefinitely. Slow work should be queued/cached server-side.
+const REQUEST_TIMEOUT_MS = 25000;
+const api = axios.create({ baseURL: BASE_URL, timeout: REQUEST_TIMEOUT_MS });
 
 // In-memory access token (per report design: token lives in memory, not
 // localStorage, and is attached to every request as a Bearer token).
@@ -41,7 +44,7 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
       try {
-        refreshPromise = refreshPromise || axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+        refreshPromise = refreshPromise || axios.post(`${BASE_URL}/auth/refresh`, { refreshToken }, { timeout: REQUEST_TIMEOUT_MS });
         const { data } = await refreshPromise;
         refreshPromise = null;
         setAccessToken(data.data.accessToken);

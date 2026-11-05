@@ -13,6 +13,9 @@ const path = require('path');
 
 const PORTFOLIO_DIR = path.join(__dirname, '..', 'generated', 'portfolio');
 const RESUME_DIR = path.join(__dirname, '..', 'generated', 'resume');
+const regenerationTimers = new Map();
+const regenerationRunning = new Set();
+const regenerationPending = new Set();
 
 const invalidateCache = async (userId) => {
   try {
@@ -34,17 +37,38 @@ const invalidateCache = async (userId) => {
 
 // Fire-and-forget regeneration; failures are logged, never thrown back to the
 // original CRUD request so an edit never fails because rendering hiccuped.
+const runRegeneration = async (userId) => {
+  const key = String(userId);
+  if (regenerationRunning.has(key)) {
+    regenerationPending.add(key);
+    return;
+  }
+
+  regenerationRunning.add(key);
+  try {
+    const { generatePortfolio } = require('./portfolioGenerator');
+    const { generateResumePDF } = require('./pdfGenerator');
+    await generatePortfolio(userId);
+    await generateResumePDF(userId);
+  } catch (err) {
+    console.error(`Background regeneration failed for user ${userId}:`, err.message);
+  } finally {
+    regenerationRunning.delete(key);
+    if (regenerationPending.delete(key)) triggerRegeneration(userId);
+  }
+};
+
+// Coalesce bursts of edits (for example, quickly adding several records) into
+// one portfolio/PDF render. Keep at most one render active per user.
 const triggerRegeneration = (userId) => {
-  setImmediate(async () => {
-    try {
-      const { generatePortfolio } = require('./portfolioGenerator');
-      const { generateResumePDF } = require('./pdfGenerator');
-      await generatePortfolio(userId);
-      await generateResumePDF(userId);
-    } catch (err) {
-      console.error(`Background regeneration failed for user ${userId}:`, err.message);
-    }
-  });
+  const key = String(userId);
+  const previous = regenerationTimers.get(key);
+  if (previous) clearTimeout(previous);
+  const timer = setTimeout(() => {
+    regenerationTimers.delete(key);
+    runRegeneration(userId);
+  }, 500);
+  regenerationTimers.set(key, timer);
 };
 
 // Single entry point CRUD routes call after mutating a user's data.

@@ -1,72 +1,57 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import FolioBrand from '../components/common/FolioBrand.jsx';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Layers3, Sparkles, UserRoundPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
-import Input from '../components/common/Input.jsx';
-import Button from '../components/common/Button.jsx';
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setLoading(true);
-    try {
-      await register(form.name, form.email, form.password);
-      navigate('/dashboard');
-    } catch (err) {
-      const msg = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || 'Registration failed';
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+    try { await register(form.name, form.email, form.password); navigate('/dashboard'); }
+    catch (error) { toast.error(error.response?.data?.errors?.[0]?.message || error.response?.data?.message || 'Registration failed'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between bg-ink text-white p-14">
-        <div className="font-mono text-xs tracking-widest text-gold uppercase">SP/ATS Studio</div>
-        <div>
-          <h1 className="font-display text-4xl font-semibold leading-tight mb-4">
-            Real-time ATS scoring,<br />not a one-time upload.
-          </h1>
-          <p className="text-white/60 text-sm max-w-sm">
-            Semantic scoring with Sentence Transformers shows you exactly how well
-            your resume matches a job — as you edit, not after you've already applied.
-          </p>
-        </div>
-        <div className="text-white/40 text-xs font-mono">CO3554 · Data Management Project</div>
-      </div>
-
-      <div className="flex items-center justify-center p-8">
-        <div className="w-full max-w-sm">
-          <h2 className="font-display text-2xl font-semibold mb-1">Create your account</h2>
-          <p className="text-sm text-muted mb-8">Set up your dashboard in under a minute.</p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input label="Full Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <Input label="Email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            <Input
-              label="Password"
-              type="password"
-              required
-              minLength={8}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
-            <p className="text-xs text-muted -mt-2">At least 8 characters, including a number.</p>
-            <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Creating account...' : 'Create account'}</Button>
+    <main className="auth-page auth-register-page">
+      <section className="auth-story">
+        <FolioBrand className="lp-brand auth-brand" iconSize={17} />
+        <div className="auth-story-copy"><span className="auth-kicker"><span /> START YOUR NEXT CHAPTER</span><h1>Make your<br />experience<br />go further.</h1><p>Create one career profile and shape it into the portfolio, resume, and job insights you need for your next opportunity.</p><div className="auth-story-points"><span><Layers3 /> Your career details, organized</span><span><Sparkles /> Portfolio and resume, in sync</span></div></div>
+        <span className="auth-story-footer">FOLIO · CAREER STUDIO</span>
+        <div className="auth-story-orbit auth-orbit-a" /><div className="auth-story-orbit auth-orbit-b" />
+      </section>
+      <section className="auth-panel">
+        <Link to="/" className="auth-back"><ArrowLeft size={15} /><span>Back to home</span></Link>
+        <div className="auth-form-wrap">
+          <FolioBrand className="lp-brand auth-brand auth-mobile-brand" iconSize={16} />
+          <div className="auth-heading-mark"><UserRoundPlus size={17} /></div>
+          <span className="auth-form-kicker">YOUR CAREER STUDIO</span>
+          <h2>Create your account.</h2>
+          <p className="auth-intro">Set up your profile and start bringing your career story together.</p>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <label className="auth-label" htmlFor="register-name">Full name</label>
+            <input className="auth-input" id="register-name" type="text" autoComplete="name" placeholder="Your name" required maxLength={100} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+            <label className="auth-label auth-register-spaced" htmlFor="register-email">Email address</label>
+            <input className="auth-input" id="register-email" type="email" autoComplete="email" placeholder="you@example.com" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
+            <label className="auth-label auth-register-spaced" htmlFor="register-password">Password</label>
+            <div className="auth-password-wrap"><input className="auth-input" id="register-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" minLength={8} required placeholder="At least 8 characters" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} /><button type="button" className="auth-eye" aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div>
+            <p className="auth-help">Use at least 8 characters and include a number.</p>
+            <button className="auth-submit" type="submit" disabled={loading}>{loading ? 'Creating account…' : <>Create account <ArrowRight size={16} /></>}</button>
           </form>
-
-          <p className="text-sm text-muted mt-6 text-center">
-            Already have an account? <Link to="/login" className="text-accent font-medium">Sign in</Link>
-          </p>
+          <p className="auth-switch">Already have an account? <Link to="/login">Sign in <ArrowRight size={14} /></Link></p>
+          <p className="auth-privacy">By creating an account, your portfolio remains private until you choose to share it.</p>
         </div>
-      </div>
-    </div>
+        <div className="auth-panel-footer"><span>© {new Date().getFullYear()} Folio Career Studio</span><Link to="/login">Sign in</Link></div>
+      </section>
+    </main>
   );
 };
 
